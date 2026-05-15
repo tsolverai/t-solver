@@ -87,12 +87,12 @@ export const Calculator: React.FC = () => {
       {/* Top Header Section */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-4">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-glow">
-            <Settings className="text-black" size={20} />
+          <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white flex items-center justify-center shadow-glow">
+            <Settings className="text-black dark:text-black" size={20} />
           </div>
           <div>
-            <h2 className="text-2xl font-black uppercase tracking-tighter italic">Premium Audit Hub</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Powered by Tachin Intelligence</p>
+            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-black dark:text-white">Premium Audit Hub</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Powered by Tachin Intelligence</p>
           </div>
         </div>
 
@@ -100,7 +100,7 @@ export const Calculator: React.FC = () => {
           <button 
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="h-14 px-8 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-3 hover:bg-white hover:text-black transition-all group"
+            className="h-14 px-8 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl flex items-center gap-3 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all group text-black dark:text-white"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4 group-hover:scale-110 transition-transform" />}
             <span className="text-[10px] font-black uppercase tracking-widest">Scan Equation</span>
@@ -124,8 +124,8 @@ export const Calculator: React.FC = () => {
             onClick={() => setMode(item.id as CalcMode)}
             className={`flex items-center gap-3 h-14 px-6 rounded-2xl border transition-all whitespace-nowrap ${
               mode === item.id 
-                ? 'bg-white border-white text-black shadow-glow' 
-                : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:bg-white/10'
+                ? 'bg-black text-white border-black dark:bg-[#fcfcfc] dark:border-[#fcfcfc] dark:text-black shadow-glow' 
+                : 'bg-black/5 border-black/5 text-black/40 hover:text-black dark:bg-white/5 dark:border-white/5 dark:text-white/40 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10'
             }`}
           >
             {item.icon}
