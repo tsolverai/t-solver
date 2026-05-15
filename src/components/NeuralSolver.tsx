@@ -44,11 +44,11 @@ export const NeuralSolver: React.FC<{ type: 'solve' | 'derive' }> = ({ type }) =
       <div className="space-y-4">
          <div className="flex items-center gap-3">
             {type === 'solve' ? <Brain size={20} className="text-[#00f2ff]" /> : <Rocket size={20} className="text-[#ff7700]" />}
-            <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
+            <h3 className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
                {type === 'solve' ? 'Quantum Equation Solver' : 'Step-by-Step Derivation Engine'}
             </h3>
          </div>
-         <h2 className="text-5xl font-black italic uppercase tracking-tighter">Enter Neural Input</h2>
+         <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter">Enter Neural Input</h2>
       </div>
 
       <div className="cyber-panel p-10 space-y-8">
@@ -59,11 +59,11 @@ export const NeuralSolver: React.FC<{ type: 'solve' | 'derive' }> = ({ type }) =
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleProcess()}
               placeholder={type === 'solve' ? "e.g. 5x + 10 = 20" : "e.g. x^2 + 5x"}
-              className="w-full h-20 bg-white/5 border border-white/10 rounded-2xl px-8 text-2xl font-black italic focus:outline-none focus:border-white transition-all placeholder:text-white/5"
+              className="w-full h-16 md:h-20 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl px-6 md:px-8 text-lg md:text-2xl font-black italic focus:outline-none focus:border-white transition-all placeholder:text-white/5"
             />
             <button 
               onClick={handleProcess}
-              className="absolute right-4 top-4 h-12 px-8 bg-white text-black rounded-xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-glow"
+              className="absolute right-3 top-3 md:right-4 md:top-4 h-10 md:h-12 px-4 md:px-8 bg-white text-black rounded-lg md:rounded-xl font-black uppercase text-[8px] md:text-[10px] tracking-widest hover:scale-105 transition-all shadow-glow"
             >
                Process
             </button>
@@ -75,9 +75,9 @@ export const NeuralSolver: React.FC<{ type: 'solve' | 'derive' }> = ({ type }) =
               animate={{ opacity: 1, y: 0 }}
               className="space-y-8 pt-8"
             >
-               <div className="p-8 bg-white/5 border border-white/5 rounded-3xl space-y-4">
+               <div className="p-6 md:p-8 bg-white/5 border border-white/5 rounded-2xl md:rounded-3xl space-y-4">
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/20">Extraction Result</p>
-                  <p className="text-4xl font-black italic tracking-tight">{result}</p>
+                  <p className="text-2xl md:text-4xl font-black italic tracking-tight">{result}</p>
                </div>
 
                <div className="space-y-6">

@@ -20,7 +20,8 @@ import {
   MessageSquare,
   Users,
   Clock,
-  Crown
+  Crown,
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +31,7 @@ import { usePWA } from './hooks/usePWA';
 import { useTranslation } from './lib/useTranslation';
 
 import { ChatBox } from './components/ChatBox';
+import { AdminDashboard } from './components/AdminDashboard';
 import { AssignmentSolver } from './components/AssignmentSolver';
 import { GraphPlotter } from './components/GraphPlotter';
 import { BusinessMode } from './components/BusinessMode';
@@ -172,6 +174,11 @@ export default function App() {
         <User size={18} />
       )
     },
+    { 
+      id: 'admin', 
+      label: 'Admin', 
+      icon: <ShieldCheck size={18} /> 
+    },
   ];
 
   const NAV_ITEMS_MOBILE = NAV_ITEMS.slice(0, 5).concat([NAV_ITEMS[NAV_ITEMS.length - 1]]);
@@ -238,6 +245,7 @@ export default function App() {
             {activeTab === 'doubts' && <CommunityDoubts key="doubts" user={currentUser} />}
             {activeTab === 'groups' && <StudyGroups key="groups" user={currentUser} />}
             {activeTab === 'leaderboard' && <Leaderboard key="leader" user={currentUser} />}
+            {activeTab === 'admin' && <AdminDashboard key="admin" />}
             {activeTab === 'games' && <EducationalGames key="games" user={currentUser} />}
             {activeTab === 'study' && <StudyHelp key="study" user={currentUser} setActiveTab={setActiveTab} />}
             {activeTab === 'quiz' && <QuizSystem key="quiz" user={currentUser} />}

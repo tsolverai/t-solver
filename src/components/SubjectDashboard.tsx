@@ -209,11 +209,11 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ subjectId, u
 
        {/* Header */}
        <header className="sticky top-0 z-10 p-8 flex items-center justify-between backdrop-blur-3xl border-b border-white/5">
-          <div className="flex items-center gap-6">
-             <button onClick={() => { if (subView) setSubView(null); else onClose(); }} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all group">
-                {subView ? <ChevronRight size={20} className="rotate-180" /> : <X size={20} className="group-hover:rotate-90 transition-transform" />}
+          <div className="flex items-center gap-4 md:gap-6">
+             <button onClick={() => { if (subView) setSubView(null); else onClose(); }} className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all group">
+                {subView ? <ChevronRight size={18} className="rotate-180" /> : <X size={18} className="group-hover:rotate-90 transition-transform" />}
              </button>
-             <div className="h-12 w-[1px] bg-white/10" />
+             <div className="h-10 w-[1px] bg-white/10" />
              <Logo size="sm" />
              <div className="space-y-1">
                 <div className="flex items-center gap-2">
