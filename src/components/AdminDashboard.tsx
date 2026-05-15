@@ -58,10 +58,17 @@ export const AdminDashboard: React.FC = () => {
         console.error("Failed to parse settings");
       }
     }
+
+    // Real-time polling
+    const interval = setInterval(() => {
+      loadData(false); // pass false to avoid showing loading spinner on background refresh
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [activeView]);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     try {
       if (activeView === 'users' || activeView === 'stats') {
         const allUsers = await storage.getAllUsers();
