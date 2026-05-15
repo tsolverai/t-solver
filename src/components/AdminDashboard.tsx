@@ -35,6 +35,9 @@ export const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
+  const [notifyUser, setNotifyUser] = useState<any | null>(null);
+  const [notificationText, setNotificationText] = useState('');
+  
   // Global Settings State
   const [settings, setSettings] = useState({
     maintenanceMode: false,
@@ -87,6 +90,26 @@ export const AdminDashboard: React.FC = () => {
     u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     u.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const sendCustomNotification = () => {
+    if (!notifyUser || !notificationText.trim()) return;
+
+    const currentNotifications = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+    currentNotifications.push({
+      id: crypto.randomUUID(),
+      targetUserId: notifyUser.id,
+      message: notificationText,
+      timestamp: Date.now(),
+      read: false
+    });
+    
+    localStorage.setItem('tsolver_notifications', JSON.stringify(currentNotifications));
+    setNotifyUser(null);
+    setNotificationText('');
+    
+    // Optional: Show success toast (assume it worked for now)
+    alert(`Notification sent to ${notifyUser.name}`);
+  };
 
   return (
     <div className="min-h-[80vh] flex flex-col gap-8 animate-fade-in pb-20">
@@ -243,6 +266,7 @@ export const AdminDashboard: React.FC = () => {
                           <td className="px-8 py-5 text-[10px] font-black text-white/20 uppercase">{new Date(user.join_date || Date.now()).toLocaleDateString()}</td>
                           <td className="px-8 py-5 text-right">
                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => setNotifyUser(user)} className="h-8 w-8 flex items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all" title="Send Notification"><Megaphone size={14} /></button>
                                 <button className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white hover:text-black transition-all"><Eye size={14} /></button>
                                 <button className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                              </div>
@@ -406,6 +430,67 @@ export const AdminDashboard: React.FC = () => {
                    <button className="h-12 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 transition-all">Purge Analytics</button>
                 </div>
              </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Notification Modal */}
+      <AnimatePresence>
+        {notifyUser && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md cyber-panel p-8 space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                    <Megaphone className="text-blue-500" size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Custom Notification</h3>
+                    <p className="text-[10px] font-bold text-white/40 tracking-widest">To: {notifyUser.name}</p>
+                  </div>
+                </div>
+                <button onClick={() => setNotifyUser(null)} className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white hover:text-black transition-all">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                <Label className="text-xs font-black uppercase italic">Message Content</Label>
+                <textarea 
+                  value={notificationText}
+                  onChange={(e) => setNotificationText(e.target.value)}
+                  placeholder="Type your alert/notification here..."
+                  className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold resize-none focus:outline-none focus:border-blue-500/50"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <button 
+                  onClick={() => setNotifyUser(null)}
+                  className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={sendCustomNotification}
+                  disabled={!notificationText.trim()}
+                  className="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-[10px] font-black uppercase tracking-widest transition-all shadow-glow"
+                >
+                  Send Push Alert
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

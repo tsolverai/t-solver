@@ -239,6 +239,8 @@ export default function App() {
       />
       <PWAInstallDialog isOpen={showPWAInstructions} onClose={() => setShowPWAInstructions(false)} />
       
+      {currentUser && <SystemNotifications userId={currentUser.id} />}
+      
       {globalSettings.announcementText && (
         <div className="bg-black text-white dark:bg-white dark:text-black px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest z-[100] relative flex items-center justify-center gap-3">
           <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
@@ -458,6 +460,61 @@ export default function App() {
             onClose={() => setActiveSubject(null)} 
           />
         )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function SystemNotifications({ userId }: { userId: string }) {
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    const checkNotifications = () => {
+      const all = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+      const myUnread = all.filter((n: any) => n.targetUserId === userId && !n.read);
+      if (JSON.stringify(myUnread) !== JSON.stringify(notifications)) {
+        setNotifications(myUnread);
+      }
+    };
+    
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 2000);
+    return () => clearInterval(interval);
+  }, [userId, notifications]);
+
+  const markAsRead = (id: string) => {
+    const all = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+    const updated = all.map((n: any) => n.id === id ? { ...n, read: true } : n);
+    localStorage.setItem('tsolver_notifications', JSON.stringify(updated));
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  if (notifications.length === 0) return null;
+
+  return (
+    <div className="fixed top-28 right-4 md:right-8 z-[100] flex flex-col gap-3 w-full max-w-sm px-4 md:px-0">
+      <AnimatePresence>
+        {notifications.map(n => (
+          <motion.div 
+            key={n.id}
+            initial={{ opacity: 0, x: 50, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            className="p-5 flex gap-4 bg-white dark:bg-black border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.15)] rounded-2xl relative overflow-hidden group"
+          >
+            <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors" />
+            <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0 relative z-10">
+              <Bell className="text-blue-500 animate-pulse" size={20} />
+            </div>
+            <div className="flex-1 space-y-1 pt-1 relative z-10">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">System Alert</h4>
+              <p className="text-xs font-bold text-black/60 dark:text-white/60 leading-relaxed">{n.message}</p>
+            </div>
+            <button onClick={() => markAsRead(n.id)} className="self-start text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white relative z-10 h-6 w-6 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-full">
+              <span className="text-xs font-black">&times;</span>
+            </button>
+          </motion.div>
+        ))}
       </AnimatePresence>
     </div>
   );
