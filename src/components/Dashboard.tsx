@@ -57,7 +57,7 @@ export const Dashboard: React.FC<{
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-3xl bg-white/5 dark:bg-zinc-900/50 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-3xl px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-16 relative overflow-hidden group shadow-xl"
+        className="w-full max-w-3xl bg-white dark:bg-zinc-900/50 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-3xl px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-16 relative overflow-hidden group shadow-xl"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
         
