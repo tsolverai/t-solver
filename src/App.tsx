@@ -181,7 +181,7 @@ export default function App() {
     },
   ].filter(item => {
     if (item.id === 'admin') {
-      const admins = ['tsolverai@gmail.com', 'admin@tsolver.com'];
+      const admins = ['tsolverai@gmail.com', 'admin@tsolver.com', 'hscstudypdf@gmail.com'];
       return currentUser && admins.includes(currentUser.email);
     }
     return true;
