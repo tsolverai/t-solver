@@ -288,7 +288,8 @@ export default function App() {
                  ))}
               </nav>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                {currentUser && <NotificationBell userId={currentUser.id} />}
                 <div className="h-10 w-[1px] bg-black/5 dark:bg-white/5 mx-2 hidden lg:block" />
                 <Button 
                   variant="ghost" 
@@ -515,6 +516,104 @@ function SystemNotifications({ userId }: { userId: string }) {
             </button>
           </motion.div>
         ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function NotificationBell({ userId }: { userId: string }) {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const checkNotifications = () => {
+      const all = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+      const myNotifications = all.filter((n: any) => n.targetUserId === userId).sort((a:any, b:any) => b.timestamp - a.timestamp);
+      if (JSON.stringify(myNotifications) !== JSON.stringify(notifications)) {
+        setNotifications(myNotifications);
+      }
+    };
+    
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 2000);
+    return () => clearInterval(interval);
+  }, [userId, notifications]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllAsRead = () => {
+    const all = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+    const updated = all.map((n: any) => n.targetUserId === userId ? { ...n, read: true } : n);
+    localStorage.setItem('tsolver_notifications', JSON.stringify(updated));
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
+  const deleteNotification = (id: string) => {
+    const all = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+    const updated = all.filter((n: any) => n.id !== id);
+    localStorage.setItem('tsolver_notifications', JSON.stringify(updated));
+    setNotifications(notifications.filter(n => n.id !== id));
+  }
+  
+  const clearAll = () => {
+    const all = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+    const updated = all.filter((n: any) => n.targetUserId !== userId);
+    localStorage.setItem('tsolver_notifications', JSON.stringify(updated));
+    setNotifications([]);
+  };
+
+  return (
+    <div className="relative">
+      <button 
+        onClick={() => { setIsOpen(!isOpen); if (!isOpen && unreadCount > 0) markAllAsRead(); }}
+        className="relative rounded-2xl h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all"
+      >
+        <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 h-4 min-w-[16px] sm:h-5 sm:min-w-[20px] px-1 sm:px-1.5 rounded-full bg-red-500 text-white text-[8px] sm:text-[9px] font-black flex items-center justify-center border-2 border-white dark:border-black shadow-glow">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <motion.div 
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute right-0 top-[120%] w-[300px] sm:w-[320px] max-h-[400px] overflow-y-auto bg-white/90 dark:bg-black/90 backdrop-blur-3xl border border-black/10 dark:border-white/10 rounded-2xl p-4 z-50 flex flex-col gap-2 shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-2 px-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Notifications</span>
+                {notifications.length > 0 && (
+                   <button onClick={clearAll} className="text-[9px] font-bold text-red-500 uppercase tracking-widest hover:underline">Clear All</button>
+                )}
+              </div>
+              
+              {notifications.length === 0 ? (
+                <div className="py-8 text-center flex flex-col items-center opacity-50">
+                   <Bell size={24} className="mb-2 text-black/20 dark:text-white/20" />
+                   <p className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">No new alerts</p>
+                </div>
+              ) : (
+                notifications.map(n => (
+                  <div key={n.id} className={`p-4 rounded-xl border relative group transition-all ${n.read ? 'bg-black/5 dark:bg-white/5 border-transparent' : 'bg-blue-500/10 border-blue-500/20 shadow-glow'}`}>
+                    <p className="text-[11px] font-bold leading-relaxed text-black dark:text-white">{n.message}</p>
+                    <div className="mt-2 flex justify-between items-center text-[8px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">
+                      <span>{new Date(n.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-black/40 hover:text-red-500 dark:text-white/40 dark:hover:text-red-500">
+                      <span className="text-xs">&times;</span>
+                    </button>
+                  </div>
+                ))
+              )}
+            </motion.div>
+          </>
+        )}
       </AnimatePresence>
     </div>
   );
