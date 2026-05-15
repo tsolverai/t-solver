@@ -335,15 +335,18 @@ class StorageManager {
     // If no local user, check Supabase session (e.g. after OAuth redirect)
     if (!id && isSupabaseConfigured()) {
       try {
-        const { data: { user: sbUser } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const sbUser = session?.user;
+        
         if (sbUser) {
-          const { data: profile } = await supabase
+          // Try to get profile, but handle potential missing table error
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', sbUser.id)
             .single();
 
-          if (profile) {
+          if (profile && !profileError) {
             const finalId = profile.local_id || profile.id;
             id = finalId;
             localStorage.setItem('tsolver_current_user', finalId);
@@ -354,10 +357,10 @@ class StorageManager {
             if (!existing) {
               const newUser: UserProfile = {
                 id: finalId,
-                name: profile.name || sbUser.user_metadata.name || 'Student',
+                name: profile.name || sbUser.user_metadata?.full_name || sbUser.user_metadata?.name || 'Student',
                 email: profile.email || sbUser.email || '',
                 level: profile.level || 'School',
-                avatar: profile.avatar || sbUser.user_metadata.avatar_url,
+                avatar: profile.avatar || sbUser.user_metadata?.avatar_url || sbUser.user_metadata?.picture,
                 thumbnail: profile.thumbnail,
                 preferences: profile.preferences || { lang: 'en', darkMode: true },
                 joinDate: profile.join_date || Date.now(),
@@ -372,15 +375,15 @@ class StorageManager {
               await db.put('users', newUser);
             }
           } else {
-            // Create new profile from OAuth data
+            // Create new profile from OAuth data or fallback
             const finalId = sbUser.id;
             id = finalId;
             const newUser: UserProfile = {
               id: finalId,
-              name: sbUser.user_metadata.full_name || sbUser.user_metadata.name || 'Student',
+              name: sbUser.user_metadata?.full_name || sbUser.user_metadata?.name || 'Student',
               email: sbUser.email || '',
               level: 'School',
-              avatar: sbUser.user_metadata.avatar_url,
+              avatar: sbUser.user_metadata?.avatar_url || sbUser.user_metadata?.picture,
               preferences: { lang: 'en', darkMode: true },
               joinDate: Date.now(),
               session: {
@@ -395,17 +398,21 @@ class StorageManager {
             await db.put('users', newUser);
             localStorage.setItem('tsolver_current_user', finalId);
             
-            // Sync to Supabase profile table
-            await supabase.from('profiles').insert({
-              id: finalId,
-              local_id: finalId,
-              name: newUser.name,
-              email: newUser.email,
-              level: newUser.level,
-              avatar: newUser.avatar,
-              preferences: newUser.preferences,
-              join_date: newUser.joinDate
-            });
+            // Sync to Supabase profile table (ignore error if table doesn't exist)
+            try {
+              await supabase.from('profiles').insert({
+                id: finalId,
+                local_id: finalId,
+                name: newUser.name,
+                email: newUser.email,
+                level: newUser.level,
+                avatar: newUser.avatar,
+                preferences: newUser.preferences,
+                join_date: newUser.joinDate
+              });
+            } catch (e) {
+              console.warn('Could not sync to profiles table:', e);
+            }
           }
         }
       } catch (err) {
@@ -416,16 +423,20 @@ class StorageManager {
     if (!id) return null;
     
     // Check session active state if not remember me
-    const db = await this.getDB();
-    const user = await db.get('users', id as string);
-    
-    if (user && user.session) {
-      if (!user.session.rememberMe && !sessionStorage.getItem('tsolver_session_active')) {
-        return null;
+    try {
+      const db = await this.getDB();
+      const user = await db.get('users', id as string);
+      
+      if (user && user.session) {
+        if (!user.session.rememberMe && !sessionStorage.getItem('tsolver_session_active')) {
+          return null;
+        }
       }
+      return user || null;
+    } catch (e) {
+      console.error('IDB retrieval failed:', e);
+      return null;
     }
-    
-    return user;
   }
 
   async logout() {
