@@ -305,6 +305,21 @@ class StorageManager {
     return null;
   }
 
+  async loginWithGoogle() {
+    if (isSupabaseConfigured()) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      
+      if (error) throw error;
+      return data;
+    }
+    throw new Error('Supabase is not configured');
+  }
+
   private getDeviceInfo() {
     const ua = navigator.userAgent;
     if (ua.includes('iPhone')) return 'iPhone';
@@ -315,12 +330,94 @@ class StorageManager {
   }
 
   async getCurrentUser(): Promise<UserProfile | null> {
-    const id = localStorage.getItem('tsolver_current_user');
+    let id: string | null = localStorage.getItem('tsolver_current_user');
+    
+    // If no local user, check Supabase session (e.g. after OAuth redirect)
+    if (!id && isSupabaseConfigured()) {
+      try {
+        const { data: { user: sbUser } } = await supabase.auth.getUser();
+        if (sbUser) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', sbUser.id)
+            .single();
+
+          if (profile) {
+            const finalId = profile.local_id || profile.id;
+            id = finalId;
+            localStorage.setItem('tsolver_current_user', finalId);
+            
+            // Re-sync profile to IDB if needed
+            const db = await this.getDB();
+            const existing = await db.get('users', finalId);
+            if (!existing) {
+              const newUser: UserProfile = {
+                id: finalId,
+                name: profile.name || sbUser.user_metadata.name || 'Student',
+                email: profile.email || sbUser.email || '',
+                level: profile.level || 'School',
+                avatar: profile.avatar || sbUser.user_metadata.avatar_url,
+                thumbnail: profile.thumbnail,
+                preferences: profile.preferences || { lang: 'en', darkMode: true },
+                joinDate: profile.join_date || Date.now(),
+                session: {
+                  id: crypto.randomUUID(),
+                  lastLogin: Date.now(),
+                  device: this.getDeviceInfo(),
+                  active: true,
+                  rememberMe: true
+                }
+              };
+              await db.put('users', newUser);
+            }
+          } else {
+            // Create new profile from OAuth data
+            const finalId = sbUser.id;
+            id = finalId;
+            const newUser: UserProfile = {
+              id: finalId,
+              name: sbUser.user_metadata.full_name || sbUser.user_metadata.name || 'Student',
+              email: sbUser.email || '',
+              level: 'School',
+              avatar: sbUser.user_metadata.avatar_url,
+              preferences: { lang: 'en', darkMode: true },
+              joinDate: Date.now(),
+              session: {
+                id: crypto.randomUUID(),
+                lastLogin: Date.now(),
+                device: this.getDeviceInfo(),
+                active: true,
+                rememberMe: true
+              }
+            };
+            const db = await this.getDB();
+            await db.put('users', newUser);
+            localStorage.setItem('tsolver_current_user', finalId);
+            
+            // Sync to Supabase profile table
+            await supabase.from('profiles').insert({
+              id: finalId,
+              local_id: finalId,
+              name: newUser.name,
+              email: newUser.email,
+              level: newUser.level,
+              avatar: newUser.avatar,
+              preferences: newUser.preferences,
+              join_date: newUser.joinDate
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase session retrieval failed:', err);
+      }
+    }
+
     if (!id) return null;
     
     // Check session active state if not remember me
     const db = await this.getDB();
-    const user = await db.get('users', id);
+    const user = await db.get('users', id as string);
     
     if (user && user.session) {
       if (!user.session.rememberMe && !sessionStorage.getItem('tsolver_session_active')) {
