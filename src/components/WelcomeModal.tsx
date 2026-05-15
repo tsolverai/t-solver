@@ -186,18 +186,6 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
 
                 <div className="w-full flex flex-col gap-3">
                   <button 
-                    onClick={() => setMode('signup')}
-                    className="h-14 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"
-                  >
-                    <UserPlus size={16} className="text-white/40" /> {t.signup}
-                  </button>
-                  <button 
-                    onClick={() => setMode('login')}
-                    className="h-14 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"
-                  >
-                    <LogIn size={16} className="text-white/40" /> {t.login}
-                  </button>
-                  <button 
                     onClick={handleGoogleLogin}
                     className="h-14 flex items-center justify-center gap-3 rounded-2xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow"
                   >
@@ -206,6 +194,20 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
                     </svg>
                     Continue with Google
                   </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setMode('signup')}
+                      className="h-14 flex-1 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"
+                    >
+                      <UserPlus size={16} className="text-white/40" /> {t.signup}
+                    </button>
+                    <button 
+                      onClick={() => setMode('login')}
+                      className="h-14 flex-1 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"
+                    >
+                      <LogIn size={16} className="text-white/40" /> {t.login}
+                    </button>
+                  </div>
                   <button 
                     onClick={() => handleCreateProfile(true)}
                     className="h-14 flex items-center justify-center gap-3 text-white/80 font-black uppercase text-[10px] tracking-widest hover:text-white transition-all underline decoration-white/10 underline-offset-8"
@@ -239,6 +241,21 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
                     <h3 className="text-2xl font-black uppercase italic tracking-tight">{t.signup}</h3>
                     <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Initialize profile heritage</p>
                   </div>
+                </div>
+
+                <button 
+                  onClick={handleGoogleLogin}
+                  className="w-full h-14 bg-white text-black rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow flex items-center justify-center gap-3"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Sign Up with Google
+                </button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+                  <div className="relative flex justify-center text-[7px] uppercase font-black tracking-[0.4em]"><span className="bg-black px-4 text-white/10 italic">Or Manual Entry</span></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,21 +312,6 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
                     Phase 2 <ArrowRight size={16} />
                   </button>
                 </div>
-
-                <div className="relative py-2">
-                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
-                  <div className="relative flex justify-center text-[8px] uppercase font-black tracking-[0.4em]"><span className="bg-black px-4 text-white/20 italic">Or Sign Up Faster</span></div>
-                </div>
-
-                <button 
-                  onClick={handleGoogleLogin}
-                  className="w-full h-14 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-3"
-                >
-                  <svg viewBox="0 0 24 24" width="14" height="14">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
-                  Sign Up with Google
-                </button>
               </motion.div>
             )}
 
