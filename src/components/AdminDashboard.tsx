@@ -37,6 +37,7 @@ export const AdminDashboard: React.FC = () => {
   
   const [notifyUser, setNotifyUser] = useState<any | null>(null);
   const [notificationText, setNotificationText] = useState('');
+  const [globalNotificationText, setGlobalNotificationText] = useState('');
   
   // Global Settings State
   const [settings, setSettings] = useState({
@@ -116,6 +117,24 @@ export const AdminDashboard: React.FC = () => {
     
     // Optional: Show success toast (assume it worked for now)
     alert(`Notification sent to ${notifyUser.name}`);
+  };
+
+  const sendGlobalNotification = () => {
+    if (!globalNotificationText.trim()) return;
+
+    const currentNotifications = JSON.parse(localStorage.getItem('tsolver_notifications') || '[]');
+    
+    const newNotifs = users.map(u => ({
+      id: crypto.randomUUID(),
+      targetUserId: u.id,
+      message: globalNotificationText,
+      timestamp: Date.now(),
+      read: false
+    }));
+
+    localStorage.setItem('tsolver_notifications', JSON.stringify([...currentNotifications, ...newNotifs]));
+    setGlobalNotificationText('');
+    alert(`Global notification sent to ${users.length} users!`);
   };
 
   return (
@@ -393,19 +412,38 @@ export const AdminDashboard: React.FC = () => {
                    </div>
                    <h3 className="text-[12px] font-black uppercase tracking-widest">System Config</h3>
                 </div>
-                <div className="space-y-6 flex-1">
+                 <div className="space-y-6 flex-1">
                    <div className="space-y-3">
-                      <Label htmlFor="announcement" className="text-xs font-black uppercase italic">Global Announcement</Label>
+                      <Label htmlFor="announcement" className="text-xs font-black uppercase italic">Top Banner Announcement</Label>
                       <textarea 
                         id="announcement"
                         value={settings.announcementText}
                         onChange={(e) => updateSetting('announcementText', e.target.value)}
-                        placeholder="Broadcast a message to all active nodes..."
-                        className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold resize-none focus:outline-none focus:border-white/30"
+                        placeholder="Displays a sticky banner at the top of the screen..."
+                        className="w-full h-16 bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold resize-none focus:outline-none focus:border-white/30"
                       />
                    </div>
+
+                   <div className="space-y-3 pt-4 border-t border-white/10">
+                      <Label className="text-xs font-black uppercase italic text-blue-400">Broadcast Push Notification</Label>
+                      <div className="flex flex-col gap-3">
+                        <textarea 
+                          value={globalNotificationText}
+                          onChange={(e) => setGlobalNotificationText(e.target.value)}
+                          placeholder="Send a bell notification to ALL users..."
+                          className="w-full h-20 bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 text-sm font-bold resize-none focus:outline-none focus:border-blue-500/50"
+                        />
+                        <button 
+                          onClick={sendGlobalNotification}
+                          disabled={!globalNotificationText.trim()}
+                          className="w-full h-10 bg-blue-500 hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-glow flex items-center justify-center gap-2"
+                        >
+                          <Megaphone size={14} /> Send to {users.length} Users
+                        </button>
+                      </div>
+                   </div>
                    
-                   <div className="flex items-center justify-between">
+                   <div className="flex items-center justify-between pt-4 border-t border-white/10">
                       <Label className="text-xs font-black uppercase italic">AI Processing</Label>
                       <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
                         <button 
