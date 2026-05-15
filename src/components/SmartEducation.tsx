@@ -16,7 +16,9 @@ import {
   FileText,
   Lightbulb,
   Gamepad2,
-  Trophy
+  Trophy,
+  History,
+  Zap
 } from 'lucide-react';
 import { localAI } from '@/lib/localAI';
 import ReactMarkdown from 'react-markdown';
@@ -69,113 +71,136 @@ export const SmartEducation: React.FC<{ user: UserProfile }> = ({ user }) => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-12 pb-20">
-      {/* Sub Navigation */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 border-b border-white/5">
-        <SubNavItem active={activeTab === 'study'} onClick={() => setActiveTab('study')} icon={<Brain size={14}/>} label="Study Help" />
-        <SubNavItem active={activeTab === 'quiz'} onClick={() => setActiveTab('quiz')} icon={<Gamepad2 size={14}/>} label="Quiz" />
-        <SubNavItem active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} icon={<BarChart size={14}/>} label="Analytics" />
-        <SubNavItem active={activeTab === 'reminders'} onClick={() => setActiveTab('reminders')} icon={<Bell size={14}/>} label="Reminders" />
-        <SubNavItem active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} icon={<FileText size={14}/>} label="Smart Notes" />
-        <SubNavItem active={activeTab === 'recommend'} onClick={() => setActiveTab('recommend')} icon={<Lightbulb size={14}/>} label="Suggest" />
-        <SubNavItem active={activeTab === 'gamify'} onClick={() => setActiveTab('gamify')} icon={<Trophy size={14}/>} label="Journey" />
+    <div className="w-full max-w-7xl mx-auto space-y-16 pb-32">
+      {/* Sub Navigation - Glassmorphic Dock */}
+      <div className="flex justify-center">
+        <div className="inline-flex items-center gap-1 p-1.5 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-[24px] backdrop-blur-3xl overflow-x-auto no-scrollbar max-w-full">
+          <SubNavItem active={activeTab === 'study'} onClick={() => setActiveTab('study')} icon={<Brain size={16}/>} label="Study Help" />
+          <SubNavItem active={activeTab === 'quiz'} onClick={() => setActiveTab('quiz')} icon={<Gamepad2 size={16}/>} label="Quiz" />
+          <SubNavItem active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} icon={<BarChart size={16}/>} label="Analytics" />
+          <SubNavItem active={activeTab === 'reminders'} onClick={() => setActiveTab('reminders')} icon={<Bell size={16}/>} label="Reminders" />
+          <SubNavItem active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} icon={<FileText size={16}/>} label="Smart Notes" />
+          <SubNavItem active={activeTab === 'recommend'} onClick={() => setActiveTab('recommend')} icon={<Lightbulb size={16}/>} label="Suggest" />
+          <SubNavItem active={activeTab === 'gamify'} onClick={() => setActiveTab('gamify')} icon={<Trophy size={16}/>} label="Journey" />
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
         {activeTab === 'study' && (
           <motion.div 
             key="study"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-8"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-12"
           >
-            <div className="cyber-panel p-8 space-y-10 relative overflow-visible">
+            <div className="cyber-panel p-10 md:p-16 space-y-12 relative overflow-visible border-black/5 dark:border-white/5">
               {/* Header Section */}
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
-                <div className="space-y-4">
-                  <h2 className="text-4xl font-black uppercase tracking-tighter italic flex items-center gap-3">
-                    Student Mode <br/>
-                    <span className="text-white/40 text-2xl font-bold">(সব subject solve)</span>
+              <div className="flex flex-col lg:flex-row justify-between items-start gap-10">
+                <div className="space-y-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                    <Zap size={10} className="text-blue-500" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-500">Neural Solve Engine</span>
+                  </div>
+                  <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter italic leading-none">
+                    Student <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-black/20 to-black dark:from-white/20 dark:to-white">Intelligence</span>
                   </h2>
-                  <p className="text-white/40 text-xs font-bold leading-relaxed px-1">
-                    আপনার প্রশ্ন লিখুন বা ছবি <br/> আপলোড করুন।
+                  <p className="text-black/40 dark:text-white/30 text-sm font-bold leading-relaxed max-w-md italic">
+                    Establish a neural connection with our solver engine. Input any complex scholastic problem for immediate resolution.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <button className="h-12 px-6 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-3 hover:bg-white/10 transition-all shadow-glow">
-                    <Camera className="h-4 w-4 text-white/60" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Scan</span>
+                <div className="flex flex-wrap items-center gap-4">
+                  <button className="h-14 px-8 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl flex items-center gap-3 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all group shadow-glow">
+                    <Camera className="h-5 w-5 text-black/40 dark:text-white/40 group-hover:text-current" />
+                    <span className="text-[11px] font-black uppercase tracking-widest">Visual Scan</span>
                   </button>
-                  <div className="flex items-center gap-4 px-6 h-12 rounded-2xl bg-white/5 border border-white/10">
-                     <Cpu className={`h-4 w-4 ${useThinking ? 'text-white animate-pulse' : 'text-white/20'}`} />
-                     <Label htmlFor="think-student" className="text-[9px] font-black uppercase tracking-[0.2em] cursor-pointer">Thinking</Label>
-                     <Switch id="think-student" checked={useThinking} onCheckedChange={setUseThinking} className="scale-75" />
+                  <div className="flex items-center gap-6 px-8 h-14 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 backdrop-blur-xl">
+                     <div className="flex items-center gap-3">
+                        <Cpu className={`h-5 w-5 ${useThinking ? 'text-blue-500 animate-pulse' : 'text-black/20 dark:text-white/20'}`} />
+                        <Label htmlFor="think-student" className="text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer hidden sm:block">Deep Thinking</Label>
+                     </div>
+                     <Switch id="think-student" checked={useThinking} onCheckedChange={setUseThinking} className="scale-90" />
                   </div>
                 </div>
               </div>
 
               {/* Form Section */}
-              <div className="space-y-8">
-                <div className="space-y-4 relative">
-                  <Label className="text-[11px] font-black uppercase tracking-widest text-white/30 px-1">বিষয় নির্বাচন করুন</Label>
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-12 pt-8 border-t border-black/5 dark:border-white/5">
+                <div className="xl:col-span-3 space-y-4">
+                  <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-black/30 dark:text-white/20 px-1">Select Sector</Label>
                   <div className="relative">
                     <button 
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="w-full sm:w-64 h-14 bg-white/5 border border-white/10 rounded-2xl px-6 flex items-center justify-between hover:bg-white/10 transition-all text-sm font-bold"
+                      className="w-full h-16 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl px-6 flex items-center justify-between hover:bg-black/10 dark:hover:bg-white/10 transition-all text-sm font-black uppercase tracking-widest"
                     >
-                      {subject} <ChevronDown className={`h-4 w-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      {subject} <ChevronDown className={`h-5 w-5 transition-transform duration-500 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
                     
                     <AnimatePresence>
                       {isDropdownOpen && (
                         <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute top-16 left-0 w-64 bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden z-50 shadow-2xl p-2"
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute top-20 left-0 w-full bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/10 rounded-3xl overflow-hidden z-50 shadow-2xl p-3"
                         >
-                          {SUBJECTS.map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => { setSubject(s); setIsDropdownOpen(false); }}
-                              className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-bold transition-all ${subject === s ? 'bg-white text-black' : 'text-white/60 hover:bg-white/5'}`}
-                            >
-                              {s}
-                            </button>
-                          ))}
+                          <div className="max-h-[300px] overflow-y-auto no-scrollbar space-y-1">
+                            {SUBJECTS.map((s) => (
+                              <button
+                                key={s}
+                                onClick={() => { setSubject(s); setIsDropdownOpen(false); }}
+                                className={`w-full text-left px-5 py-4 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${subject === s ? 'bg-black dark:bg-white text-white dark:text-black' : 'text-black/60 dark:text-white/40 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                              >
+                                {s}
+                              </button>
+                            ))}
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
+                  
+                  <div className="pt-8 space-y-4 hidden xl:block">
+                     <div className="flex items-center gap-3 text-black/20 dark:text-white/20">
+                        <History size={16} />
+                        <span className="text-[9px] font-black uppercase tracking-widest">Recent Queries</span>
+                     </div>
+                     <div className="space-y-2">
+                        <div className="h-10 w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-xl animate-pulse" />
+                        <div className="h-10 w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-xl animate-pulse" />
+                     </div>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="xl:col-span-9 space-y-6">
                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-[40px] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-700 pointer-events-none" />
                       <textarea 
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="আপনার প্রশ্নটি এখানে লিখুন অথবা ছবি ড্র্যাগ করে আনুন..."
-                        className="w-full min-h-[220px] bg-white/5 border border-white/10 rounded-[32px] p-8 text-lg font-bold placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/10 transition-all resize-none no-scrollbar"
+                        placeholder="Establish query parameters here..."
+                        className="relative w-full min-h-[280px] bg-black/5 dark:bg-white/[0.03] border border-black/5 dark:border-white/10 rounded-[40px] p-10 text-xl font-bold placeholder:text-black/10 dark:placeholder:text-white/10 focus:outline-none focus:border-black/20 dark:focus:border-white/20 transition-all resize-none no-scrollbar"
                       />
                       
-                      <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <button className="h-12 w-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/40 hover:text-white transition-all">
-                            <Mic size={18} />
+                      <div className="absolute bottom-8 left-8 right-8 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <button className="h-12 w-12 flex items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black dark:hover:bg-white text-black/40 dark:text-white/40 hover:text-white dark:hover:text-black transition-all group">
+                            <Mic size={20} className="group-hover:scale-110 transition-transform" />
                           </button>
-                          <button className="h-12 w-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/40 hover:text-white transition-all">
-                            <ImageIcon size={18} />
+                          <button className="h-12 w-12 flex items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black dark:hover:bg-white text-black/40 dark:text-white/40 hover:text-white dark:hover:text-black transition-all group">
+                            <ImageIcon size={20} className="group-hover:scale-110 transition-transform" />
                           </button>
                         </div>
                         
                         <button 
                           onClick={handleSolve}
                           disabled={loading || !input.trim()}
-                          className="h-14 px-12 bg-[#8a8a8a]/20 border border-white/10 text-white rounded-2xl flex items-center gap-4 font-black uppercase text-xs tracking-[0.2em] hover:bg-white hover:text-black transition-all disabled:opacity-30"
+                          className="h-16 px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl flex items-center gap-4 font-black uppercase text-xs tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none shadow-2xl"
                         >
-                          {loading ? <Loader2 className="animate-spin h-5 w-5" /> : <><SendHorizontal size={18} /> Solve</>}
+                          {loading ? <Loader2 className="animate-spin h-5 w-5" /> : <><SendHorizontal size={20} /> Establish Solve</>}
                         </button>
                       </div>
                    </div>
@@ -186,17 +211,28 @@ export const SmartEducation: React.FC<{ user: UserProfile }> = ({ user }) => {
               <AnimatePresence>
                 {result && (
                   <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="pt-8 border-t border-white/5 space-y-6"
+                    className="pt-12 border-t border-black/5 dark:border-white/5 space-y-8"
                   >
-                    <div className="flex items-center gap-3">
-                       <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center shadow-glow">
-                         <Sparkles className="h-4 w-4 text-black" />
-                       </div>
-                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">AI Logic Solution</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                         <div className="h-12 w-12 rounded-2xl bg-black dark:bg-white flex items-center justify-center shadow-glow">
+                           <Sparkles className="h-6 w-6 text-white dark:text-black" />
+                         </div>
+                         <div className="flex flex-col">
+                            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-black/60 dark:text-white/40">Neural Output Terminal</span>
+                            <span className="text-[9px] font-bold text-green-500 uppercase tracking-widest">Resolution Successful</span>
+                         </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                         <div className="h-2 w-2 rounded-full bg-green-500 animate-ping" />
+                         <span className="text-[9px] font-black uppercase tracking-widest text-black/20 dark:text-white/20">Synced with Local Node</span>
+                      </div>
                     </div>
-                    <ScrollArea className="h-fit max-h-[500px] w-full bg-white/[0.02] border border-white/5 rounded-3xl p-8">
+
+                    <ScrollArea className="h-fit max-h-[600px] w-full bg-black/[0.02] dark:bg-white/[0.01] border border-black/5 dark:border-white/5 rounded-[40px] p-10 md:p-16">
                       <div className="markdown-body">
                         <ReactMarkdown>{result}</ReactMarkdown>
                       </div>
@@ -223,10 +259,18 @@ function SubNavItem({ active, onClick, icon, label }: { active: boolean, onClick
   return (
     <button 
       onClick={onClick}
-      className={`px-6 py-3 rounded-xl flex items-center gap-3 transition-all whitespace-nowrap text-[10px] font-black uppercase tracking-widest ${active ? 'bg-white text-black shadow-glow' : 'text-white/20 hover:text-white/40'}`}
+      className={`px-8 py-3.5 rounded-[20px] flex items-center gap-3 transition-all whitespace-nowrap text-[10px] font-black uppercase tracking-widest relative group ${active ? 'text-black dark:text-white' : 'text-black/30 dark:text-white/20 hover:text-black/50 dark:hover:text-white/40'}`}
     >
-      {icon}
-      {label}
+      {active && (
+        <motion.div 
+          layoutId="subnav-active"
+          className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-[18px] shadow-xl"
+          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+        />
+      )}
+      <span className="relative z-10">{icon}</span>
+      <span className="relative z-10">{label}</span>
     </button>
   );
 }
+

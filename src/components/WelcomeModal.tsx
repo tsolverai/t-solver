@@ -37,6 +37,10 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
 
   const t = translations[lang] || translations.en;
 
+  const [globalSettings, setGlobalSettings] = useState({
+    publicRegistration: true,
+  });
+
   useEffect(() => {
     // Attempt local lang detection
     const saved = localStorage.getItem('tsolver_lang') as SupportedLanguage;
@@ -44,6 +48,13 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
       setLang(saved);
       // We still show the welcome screen if they aren't fully initialized
       setMode('welcome'); 
+    }
+
+    const savedSettings = localStorage.getItem('tsolver_global_settings');
+    if (savedSettings) {
+      try {
+        setGlobalSettings(JSON.parse(savedSettings));
+      } catch (e) {}
     }
   }, []);
 
@@ -195,12 +206,14 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
                     Continue with Google
                   </button>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => setMode('signup')}
-                      className="h-14 flex-1 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"
-                    >
-                      <UserPlus size={16} className="text-white/40" /> {t.signup}
-                    </button>
+                    {globalSettings.publicRegistration && (
+                      <button 
+                        onClick={() => setMode('signup')}
+                        className="h-14 flex-1 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"
+                      >
+                        <UserPlus size={16} className="text-white/40" /> {t.signup}
+                      </button>
+                    )}
                     <button 
                       onClick={() => setMode('login')}
                       className="h-14 flex-1 flex items-center justify-center gap-3 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition-all"

@@ -82,6 +82,15 @@ export default function App() {
   const [showWhatsapp, setShowWhatsapp] = useState(false);
   const { isInstallable, isIOS, installApp } = usePWA();
   const { lang, t } = useTranslation();
+  
+  const [globalSettings, setGlobalSettings] = useState({
+    maintenanceMode: false,
+    publicRegistration: true,
+    announcementText: '',
+    enableGames: true,
+    enableCommunity: true,
+    aiProvider: 'local'
+  });
 
   const handleInstallClick = () => {
     if (isIOS) {
@@ -103,8 +112,22 @@ export default function App() {
       if (!lastShown) {
         setTimeout(() => setShowWhatsapp(true), 3000);
       }
+      
+      // Global Settings logic
+      const savedSettings = localStorage.getItem('tsolver_global_settings');
+      if (savedSettings) {
+        try {
+          setGlobalSettings(JSON.parse(savedSettings));
+        } catch (e) {}
+      }
     }
     init();
+
+    // Listen for global settings updates
+    const handleSettingsUpdate = (e: any) => {
+      setGlobalSettings(e.detail);
+    };
+    window.addEventListener('tsolver-settings-updated', handleSettingsUpdate);
 
     // Listen for profile updates from ProfileSettings or other parts
     const handleProfileUpdate = (e: any) => {
@@ -123,6 +146,7 @@ export default function App() {
     return () => {
       window.removeEventListener('user-profile-updated', handleProfileUpdate);
       window.removeEventListener('start-ai-solve', handleAISolve);
+      window.removeEventListener('tsolver-settings-updated', handleSettingsUpdate);
     };
   }, []);
 
@@ -186,6 +210,21 @@ export default function App() {
     return true;
   });
 
+  const isAdmin = currentUser && ['tsolverai@gmail.com', 'admin@tsolver.com', 'hscstudypdf@gmail.com'].includes(currentUser.email);
+
+  if (globalSettings.maintenanceMode && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 text-center space-y-6 selection:bg-white selection:text-black">
+        <Logo size="lg" />
+        <h1 className="text-4xl font-black uppercase tracking-tighter italic">System Maintenance</h1>
+        <p className="text-white/40 font-bold max-w-md">Our neural nodes are currently undergoing scheduled upgrades. Access will be restored shortly. Please stand by.</p>
+        <div className="h-1 w-24 bg-white/10 rounded-full overflow-hidden relative">
+           <div className="absolute top-0 bottom-0 left-0 w-1/2 bg-white rounded-full animate-ping" />
+        </div>
+      </div>
+    );
+  }
+
   const NAV_ITEMS_MOBILE = NAV_ITEMS.slice(0, 5).concat([NAV_ITEMS[NAV_ITEMS.length - 1]]);
 
   return (
@@ -200,41 +239,62 @@ export default function App() {
       />
       <PWAInstallDialog isOpen={showPWAInstructions} onClose={() => setShowPWAInstructions(false)} />
       
+      {globalSettings.announcementText && (
+        <div className="bg-black text-white dark:bg-white dark:text-black px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest z-[100] relative flex items-center justify-center gap-3">
+          <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+          {globalSettings.announcementText}
+        </div>
+      )}
+
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-black/80 backdrop-blur-3xl border-b border-black/5 dark:border-white/5 transition-colors">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="h-20 flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('about')}>
-              <Logo size="sm" />
+      <header className="sticky top-0 z-50 bg-white/40 dark:bg-black/40 backdrop-blur-2xl border-b border-black/5 dark:border-white/5 transition-all duration-500">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="h-24 flex items-center justify-between">
+            <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setActiveTab('about')}>
+              <div className="relative">
+                <Logo size="sm" className="group-hover:rotate-12 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-white/20 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
               
-              <div className="flex flex-col ml-1">
-                <h1 className="text-xl font-black uppercase italic tracking-tighter leading-none">T-Solver</h1>
-                <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-20 text-black dark:text-white">Student Logic Engine</p>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-black uppercase italic tracking-tighter leading-none">T-Solver</h1>
+                  <div className="px-1.5 py-0.5 rounded-md bg-black dark:bg-white text-[6px] font-black text-white dark:text-black uppercase tracking-widest">v4.0</div>
+                </div>
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30 text-black dark:text-white">Neural Logic Engine</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="hidden lg:flex items-center gap-1 overflow-x-auto no-scrollbar max-w-xl">
+            <div className="flex items-center gap-6">
+              <nav className="hidden lg:flex items-center gap-1 p-1 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 backdrop-blur-xl">
                  {NAV_ITEMS.map(item => (
                    <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`h-10 px-4 rounded-xl flex items-center gap-2 transition-all whitespace-nowrap text-[9px] font-black uppercase tracking-widest ${activeTab === item.id ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black/40 dark:text-white/40'}`}
+                    className={`h-11 px-5 rounded-xl flex items-center gap-2.5 transition-all whitespace-nowrap text-[10px] font-black uppercase tracking-widest relative group ${activeTab === item.id ? 'text-black dark:text-white' : 'text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white'}`}
                    >
-                     {item.icon}
-                     {item.label}
+                     {activeTab === item.id && (
+                       <motion.div 
+                        layoutId="header-nav-bg"
+                        className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                       />
+                     )}
+                     <span className="relative z-10 opacity-70 group-hover:opacity-100 transition-opacity">{item.icon}</span>
+                     <span className="relative z-10">{item.label}</span>
                    </button>
                  ))}
-              </div>
+              </nav>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-[1px] bg-black/5 dark:bg-white/5 mx-2 hidden lg:block" />
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setIsDarkMode(!isDarkMode)} 
-                  className="rounded-xl h-11 w-11 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10"
+                  className="rounded-2xl h-12 w-12 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
                 >
-                  {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  {isDarkMode ? <Sun className="h-5 w-5 group-hover:rotate-45 transition-transform" /> : <Moon className="h-5 w-5 group-hover:-rotate-12 transition-transform" />}
                 </Button>
               </div>
             </div>
@@ -340,20 +400,55 @@ export default function App() {
       </div>
 
       {/* Copyright Footer */}
-      <div className="py-24 pb-48 flex flex-col items-center gap-8 opacity-40">
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[9px] font-black uppercase tracking-[0.3em]">
-           <button onClick={() => setActiveTab('about')} className="hover:text-foreground transition-colors">About</button>
-           <button onClick={() => setActiveTab('how-to-use')} className="hover:text-foreground transition-colors">Guide</button>
-           <button onClick={() => setActiveTab('privacy')} className="hover:text-foreground transition-colors">Privacy</button>
-           <button onClick={() => setActiveTab('terms')} className="hover:text-foreground transition-colors">Terms</button>
-           <button onClick={() => setActiveTab('contact')} className="hover:text-foreground transition-colors">Contact</button>
+      <footer className="py-32 pb-48 relative overflow-hidden border-t border-black/5 dark:border-white/5">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
-        <div className="flex items-center gap-4 text-[8px] font-black uppercase tracking-[0.5em] opacity-40 select-none pointer-events-none">
-           <span>© {new Date().getFullYear()} T-Solver</span>
-           <div className="h-1 w-1 bg-black dark:bg-white rounded-full opacity-20" />
-           <span>Architected by Tachin Ahmed Rion</span>
+
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-16">
+          <div className="flex flex-col items-center gap-6">
+            <Logo size="md" />
+            <div className="flex flex-col items-center">
+              <h2 className="text-3xl font-black uppercase italic tracking-tighter">T-Solver</h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30 mt-2">Next-Gen Scholastic Platform</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-[10px] font-black uppercase tracking-[0.3em]">
+             <button onClick={() => setActiveTab('about')} className="hover:text-primary transition-colors relative group">
+                About
+                <div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary group-hover:w-full transition-all" />
+             </button>
+             <button onClick={() => setActiveTab('how-to-use')} className="hover:text-primary transition-colors relative group">
+                Guide
+                <div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary group-hover:w-full transition-all" />
+             </button>
+             <button onClick={() => setActiveTab('privacy')} className="hover:text-primary transition-colors relative group">
+                Privacy
+                <div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary group-hover:w-full transition-all" />
+             </button>
+             <button onClick={() => setActiveTab('terms')} className="hover:text-primary transition-colors relative group">
+                Terms
+                <div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary group-hover:w-full transition-all" />
+             </button>
+             <button onClick={() => setActiveTab('contact')} className="hover:text-primary transition-colors relative group">
+                Contact
+                <div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary group-hover:w-full transition-all" />
+             </button>
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.5em] opacity-20 select-none pointer-events-none text-center">
+               <span>© {new Date().getFullYear()} T-Solver Corporation</span>
+               <div className="h-1.5 w-1.5 bg-black dark:bg-white rounded-full opacity-20" />
+               <span>All Rights Reserved</span>
+            </div>
+            <div className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40">
+               Architected with precision by <span className="text-primary opacity-100">Tachin Ahmed Rion</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </footer>
 
       <AnimatePresence>
         {activeSubject && currentUser && (

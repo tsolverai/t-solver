@@ -25,8 +25,34 @@
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-white selection:text-black transition-colors duration-500 overflow-x-hidden;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .light ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .light ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -95,14 +121,19 @@
 }
 
 .cyber-panel {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.02);
   backdrop-filter: blur(40px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 2rem;
 }
 
 .dark .cyber-panel {
   background: rgba(0,0,0,0.4);
+}
+
+.light .cyber-panel {
+  background: rgba(255,255,255,0.8);
+  border-color: rgba(0,0,0,0.05);
 }
 
 .cyber-button {
@@ -149,14 +180,6 @@
 }
 
 /* Light Mode Overrides */
-.light {
-  --color-background: #fdfdfd;
-  --color-foreground: #000000;
-  --color-border: #eeeeee;
-  --color-muted: #f4f4f5;
-  --color-muted-foreground: #71717a;
-}
-
 .light .markdown-body {
   @apply text-black/70 font-bold;
 }
@@ -174,7 +197,7 @@
 }
 
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  @apply font-black text-xl text-white uppercase tracking-tight italic;
+  @apply font-black text-2xl text-white uppercase tracking-tight italic;
 }
 
 .markdown-body p {
@@ -222,3 +245,14 @@
   font-family: serif;
   text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.1);
 }
+
+/* Animations */
+@keyframes slow-pan {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
+}
+
+.animate-slow-pan {
+  animation: slow-pan 2s linear infinite;
+}
+

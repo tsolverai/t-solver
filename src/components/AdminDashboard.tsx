@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -16,11 +15,18 @@ import {
   UserCheck,
   UserX,
   Lock,
-  Eye
+  Eye,
+  Megaphone,
+  Gamepad2,
+  Globe,
+  Cpu,
+  Power
 } from 'lucide-react';
 import { storage, UserProfile } from '../lib/storage';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Logo } from './Logo';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 export const AdminDashboard: React.FC = () => {
   const [activeView, setActiveView] = useState<'stats' | 'users' | 'feedback' | 'settings'>('stats');
@@ -28,9 +34,27 @@ export const AdminDashboard: React.FC = () => {
   const [feedback, setFeedback] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Global Settings State
+  const [settings, setSettings] = useState({
+    maintenanceMode: false,
+    publicRegistration: true,
+    announcementText: '',
+    enableGames: true,
+    enableCommunity: true,
+    aiProvider: 'local'
+  });
 
   useEffect(() => {
     loadData();
+    const savedSettings = localStorage.getItem('tsolver_global_settings');
+    if (savedSettings) {
+      try {
+        setSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error("Failed to parse settings");
+      }
+    }
   }, [activeView]);
 
   const loadData = async () => {
@@ -48,6 +72,13 @@ export const AdminDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateSetting = (key: string, value: any) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
+    localStorage.setItem('tsolver_global_settings', JSON.stringify(newSettings));
+    window.dispatchEvent(new CustomEvent('tsolver-settings-updated', { detail: newSettings }));
   };
 
   const filteredUsers = users.filter(u => 
@@ -82,7 +113,7 @@ export const AdminDashboard: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setActiveView(item.id as any)}
-              className={`h-11 px-6 rounded-xl flex items-center gap-3 transition-all text-[9px] font-black uppercase tracking-widest ${activeView === item.id ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`}
+              className={`h-11 px-6 rounded-xl flex items-center gap-3 transition-all text-[9px] font-black uppercase tracking-widest ${activeView === item.id ? 'bg-white text-black shadow-glow' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <item.icon size={14} />
               <span className="hidden sm:inline">{item.label}</span>
@@ -129,7 +160,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="space-y-4">
                      {[
-                       { label: 'Supabase Auth Gateway', status: 'Optimal', val: 99 },
+                       { label: 'Supabase Auth Gateway', status: isSupabaseConfigured() ? 'Optimal' : 'Offline', val: isSupabaseConfigured() ? 99 : 0 },
                        { label: 'Cloud Storage Sync', status: 'Healthy', val: 92 },
                        { label: 'Local IDB Synchronization', status: 'Active', val: 100 },
                        { label: 'Neural Engine Core', status: 'Running', val: 85 }
@@ -192,7 +223,7 @@ export const AdminDashboard: React.FC = () => {
                             <td colSpan={6} className="px-8 py-6 h-16 bg-white/[0.01]" />
                           </tr>
                         ))
-                      ) : filteredUsers.map(user => (
+                      ) : filteredUsers.length > 0 ? filteredUsers.map(user => (
                         <tr key={user.id} className="hover:bg-white/[0.02] transition-colors group">
                           <td className="px-8 py-5 text-[10px] font-mono text-white/20">#{user.id.substring(0, 8)}</td>
                           <td className="px-8 py-5">
@@ -207,7 +238,7 @@ export const AdminDashboard: React.FC = () => {
                           <td className="px-8 py-5">
                              <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-[9px] font-black uppercase tracking-widest text-white/60">{user.level}</span>
                           </td>
-                          <td className="px-8 py-5 text-[10px] font-black text-white/20 uppercase">{new Date(user.join_date).toLocaleDateString()}</td>
+                          <td className="px-8 py-5 text-[10px] font-black text-white/20 uppercase">{new Date(user.join_date || Date.now()).toLocaleDateString()}</td>
                           <td className="px-8 py-5 text-right">
                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white hover:text-black transition-all"><Eye size={14} /></button>
@@ -215,12 +246,45 @@ export const AdminDashboard: React.FC = () => {
                              </div>
                           </td>
                         </tr>
-                      ))}
+                      )) : (
+                        <tr>
+                          <td colSpan={6} className="px-8 py-12 text-center text-white/40 text-sm font-bold">No users found. {isSupabaseConfigured() ? '' : 'Supabase is not configured.'}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                </div>
             </div>
           </motion.div>
+        )}
+        
+        {activeView === 'feedback' && (
+           <motion.div 
+             key="feedback"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             className="cyber-panel p-8"
+           >
+              {feedback.length > 0 ? (
+                 <div className="space-y-4">
+                    {feedback.map((f, i) => (
+                       <div key={i} className="p-6 bg-white/5 rounded-2xl border border-white/5">
+                          <p className="text-sm font-bold text-white mb-2">{f.content}</p>
+                          <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-white/40">
+                             <span>{f.type || 'General'}</span>
+                             <span>{new Date(f.created_at).toLocaleString()}</span>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+              ) : (
+                 <div className="py-20 text-center flex flex-col items-center justify-center opacity-50">
+                    <MessageSquare size={48} className="mb-4 text-white/20" />
+                    <p className="text-xl font-black uppercase tracking-widest">No Feedback Yet</p>
+                    <p className="text-[10px] font-bold text-white/40 tracking-[0.2em] mt-2">Check back later for user reports.</p>
+                 </div>
+              )}
+           </motion.div>
         )}
 
         {activeView === 'settings' && (
@@ -228,39 +292,116 @@ export const AdminDashboard: React.FC = () => {
             key="settings"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-             <div className="cyber-panel p-8 space-y-8">
-                <div className="flex items-center gap-4">
-                   <Lock className="text-white/20" size={20} />
-                   <h3 className="text-[10px] font-black uppercase tracking-widest">Access Control</h3>
+             {/* Access Control Card */}
+             <div className="cyber-panel p-8 space-y-8 flex flex-col">
+                <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+                   <div className="h-10 w-10 bg-red-500/10 rounded-xl flex items-center justify-center">
+                     <Lock className="text-red-500" size={20} />
+                   </div>
+                   <h3 className="text-[12px] font-black uppercase tracking-widest">Access Control</h3>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-6 flex-1">
                    <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                         <p className="text-xs font-black uppercase italic">Maintenance Mode</p>
-                         <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest">Disable public access for updates</p>
+                         <Label htmlFor="maintenance" className="text-xs font-black uppercase italic cursor-pointer">Maintenance Mode</Label>
+                         <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest max-w-[180px]">Block non-admins</p>
                       </div>
-                      <div className="h-6 w-12 bg-white/5 rounded-full border border-white/10" />
+                      <Switch id="maintenance" checked={settings.maintenanceMode} onCheckedChange={(v) => updateSetting('maintenanceMode', v)} />
                    </div>
                    <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                         <p className="text-xs font-black uppercase italic">Public Registration</p>
-                         <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest">Allow new user signups</p>
+                         <Label htmlFor="registration" className="text-xs font-black uppercase italic cursor-pointer">Public Registration</Label>
+                         <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest max-w-[180px]">Allow new user signups</p>
                       </div>
-                      <div className="h-6 w-12 bg-green-500 rounded-full border border-white/10 flex items-center justify-end px-1"><div className="h-4 w-4 bg-white rounded-full" /></div>
+                      <Switch id="registration" checked={settings.publicRegistration} onCheckedChange={(v) => updateSetting('publicRegistration', v)} />
                    </div>
                 </div>
              </div>
 
-             <div className="cyber-panel p-8 space-y-8">
-                <div className="flex items-center gap-4">
-                   <RefreshCw className="text-white/20" size={20} />
-                   <h3 className="text-[10px] font-black uppercase tracking-widest">Cache Management</h3>
+             {/* Feature Toggles Card */}
+             <div className="cyber-panel p-8 space-y-8 flex flex-col">
+                <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+                   <div className="h-10 w-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                     <Power className="text-blue-500" size={20} />
+                   </div>
+                   <h3 className="text-[12px] font-black uppercase tracking-widest">Feature Modules</h3>
                 </div>
-                <div className="space-y-4">
-                   <button className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Clear Session Vault</button>
-                   <button className="w-full h-12 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Flush Neural Cache</button>
+                <div className="space-y-6 flex-1">
+                   <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                         <div className="flex items-center gap-2">
+                           <Gamepad2 size={12} className="text-white/60" />
+                           <Label htmlFor="games" className="text-xs font-black uppercase italic cursor-pointer">Logic Playground</Label>
+                         </div>
+                         <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest max-w-[180px]">Enable educational games</p>
+                      </div>
+                      <Switch id="games" checked={settings.enableGames} onCheckedChange={(v) => updateSetting('enableGames', v)} />
+                   </div>
+                   <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                         <div className="flex items-center gap-2">
+                           <Globe size={12} className="text-white/60" />
+                           <Label htmlFor="community" className="text-xs font-black uppercase italic cursor-pointer">Community Features</Label>
+                         </div>
+                         <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest max-w-[180px]">Enable doubts & feed</p>
+                      </div>
+                      <Switch id="community" checked={settings.enableCommunity} onCheckedChange={(v) => updateSetting('enableCommunity', v)} />
+                   </div>
+                </div>
+             </div>
+
+             {/* System Configuration Card */}
+             <div className="cyber-panel p-8 space-y-8 flex flex-col lg:col-span-1 md:col-span-2">
+                <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+                   <div className="h-10 w-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                     <Cpu className="text-purple-500" size={20} />
+                   </div>
+                   <h3 className="text-[12px] font-black uppercase tracking-widest">System Config</h3>
+                </div>
+                <div className="space-y-6 flex-1">
+                   <div className="space-y-3">
+                      <Label htmlFor="announcement" className="text-xs font-black uppercase italic">Global Announcement</Label>
+                      <textarea 
+                        id="announcement"
+                        value={settings.announcementText}
+                        onChange={(e) => updateSetting('announcementText', e.target.value)}
+                        placeholder="Broadcast a message to all active nodes..."
+                        className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold resize-none focus:outline-none focus:border-white/30"
+                      />
+                   </div>
+                   
+                   <div className="flex items-center justify-between">
+                      <Label className="text-xs font-black uppercase italic">AI Processing</Label>
+                      <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
+                        <button 
+                          onClick={() => updateSetting('aiProvider', 'local')}
+                          className={`px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${settings.aiProvider === 'local' ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`}
+                        >
+                          Local Model
+                        </button>
+                        <button 
+                          onClick={() => updateSetting('aiProvider', 'cloud')}
+                          className={`px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${settings.aiProvider === 'cloud' ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`}
+                        >
+                          Cloud API
+                        </button>
+                      </div>
+                   </div>
+                </div>
+             </div>
+
+             {/* Danger Zone */}
+             <div className="cyber-panel p-8 space-y-6 lg:col-span-3 border-red-500/20 bg-red-500/5">
+                <div className="flex items-center gap-4">
+                   <Trash2 className="text-red-500" size={20} />
+                   <h3 className="text-[12px] font-black uppercase tracking-widest text-red-500">Danger Zone</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   <button className="h-12 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 transition-all">Clear Session Vault</button>
+                   <button className="h-12 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 transition-all">Flush Neural Cache</button>
+                   <button className="h-12 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 transition-all">Purge Analytics</button>
                 </div>
              </div>
           </motion.div>
