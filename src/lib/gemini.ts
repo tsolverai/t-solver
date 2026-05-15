@@ -9,7 +9,8 @@ const getApiKey = () => {
   const viteKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   if (viteKey && viteKey !== "undefined") return viteKey;
 
-  return null;
+  // Hardcoded fallback provided by user
+  return "AIzaSyAcFsGqTLTrSIgNvm1C7ID60cYkqxaBg1U";
 };
 
 const apiKey = getApiKey();
