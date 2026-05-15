@@ -885,6 +885,76 @@ class StorageManager {
     }
   }
 
+  async getAllPayments() {
+    const db = await this.getDB();
+    const localPayments = await db.getAll('payments');
+    let allPayments = [...localPayments];
+
+    if (isSupabaseConfigured()) {
+      try {
+        const { data } = await supabase.from('payments').select('*').order('timestamp', { ascending: false });
+        if (data && data.length > 0) {
+           const sbPayments = data.map((p: any) => ({
+             id: p.id,
+             userId: p.local_user_id || p.user_id,
+             planId: p.plan_id,
+             amount: p.amount,
+             txid: p.txid,
+             status: p.status,
+             timestamp: new Date(p.timestamp).getTime()
+           }));
+           
+           const existingIds = new Set(allPayments.map(p => p.id));
+           sbPayments.forEach((sp: any) => {
+             if (!existingIds.has(sp.id)) {
+               allPayments.push(sp);
+             }
+           });
+        }
+      } catch (err) {
+        console.warn('Could not fetch payments from Supabase');
+      }
+    }
+    return allPayments.sort((a, b) => b.timestamp - a.timestamp);
+  }
+
+  async updatePaymentStatus(paymentId: string, newStatus: 'approved' | 'rejected', userId: string) {
+    const db = await this.getDB();
+    const payment = await db.get('payments', paymentId);
+    if (payment) {
+      payment.status = newStatus;
+      await db.put('payments', payment);
+    } else {
+      // If payment only exists in Supabase but not locally, we should create a local stub or fetch it
+      // For simplicity, we just put a stub if missing
+      await db.put('payments', { id: paymentId, status: newStatus, userId });
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        // Update payment status
+        await supabase.from('payments').update({ status: newStatus }).eq('id', paymentId);
+        
+        // If approved, add to premium_users
+        if (newStatus === 'approved') {
+           // We need the supabase user_id. We'll try to get it by joining profiles or just inserting with local_id
+           // Assuming premium_users can take local_id for simplicity or we fetch the profile
+           const { data: profile } = await supabase.from('profiles').select('id').eq('local_id', userId).single();
+           if (profile) {
+              await supabase.from('premium_users').upsert({
+                user_id: profile.id,
+                plan_id: payment?.planId || 'premium',
+                activated_at: new Date().toISOString(),
+                expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+              });
+           }
+        }
+      } catch (err) {
+        console.warn('Failed to update payment status in Supabase', err);
+      }
+    }
+  }
+
   async isPremium(userId: string): Promise<boolean> {
     if (isSupabaseConfigured()) {
       try {

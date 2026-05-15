@@ -20,7 +20,10 @@ import {
   Gamepad2,
   Globe,
   Cpu,
-  Power
+  Power,
+  Crown,
+  Check,
+  X
 } from 'lucide-react';
 import { storage, UserProfile } from '../lib/storage';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -29,9 +32,10 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 export const AdminDashboard: React.FC = () => {
-  const [activeView, setActiveView] = useState<'stats' | 'users' | 'feedback' | 'settings'>('stats');
+  const [activeView, setActiveView] = useState<'stats' | 'users' | 'feedback' | 'settings' | 'payments'>('stats');
   const [users, setUsers] = useState<any[]>([]);
   const [feedback, setFeedback] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -71,9 +75,14 @@ export const AdminDashboard: React.FC = () => {
   const loadData = async (showLoader = true) => {
     if (showLoader) setLoading(true);
     try {
-      if (activeView === 'users' || activeView === 'stats') {
+      if (activeView === 'users' || activeView === 'stats' || activeView === 'payments') {
         const allUsers = await storage.getAllUsers();
         setUsers(allUsers || []);
+      }
+      
+      if (activeView === 'payments' || activeView === 'stats') {
+        const allPayments = await storage.getAllPayments();
+        setPayments(allPayments || []);
       }
       
       if ((activeView === 'feedback' || activeView === 'stats') && isSupabaseConfigured()) {
@@ -137,6 +146,13 @@ export const AdminDashboard: React.FC = () => {
     alert(`Global notification sent to ${users.length} users!`);
   };
 
+  const handlePaymentAction = async (paymentId: string, status: 'approved' | 'rejected', userId: string) => {
+    if (confirm(`Are you sure you want to ${status} this payment?`)) {
+      await storage.updatePaymentStatus(paymentId, status, userId);
+      loadData(false); // Refresh list
+    }
+  };
+
   return (
     <div className="min-h-[80vh] flex flex-col gap-8 animate-fade-in pb-20">
       {/* Admin Header */}
@@ -158,6 +174,7 @@ export const AdminDashboard: React.FC = () => {
           {[
             { id: 'stats', icon: Activity, label: 'Stats' },
             { id: 'users', icon: Users, label: 'Users' },
+            { id: 'payments', icon: Crown, label: 'Payments' },
             { id: 'feedback', icon: MessageSquare, label: 'Reports' },
             { id: 'settings', icon: Settings, label: 'Core' }
           ].map(item => (
@@ -301,6 +318,71 @@ export const AdminDashboard: React.FC = () => {
                       )) : (
                         <tr>
                           <td colSpan={6} className="px-8 py-12 text-center text-white/40 text-sm font-bold">No users found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeView === 'payments' && (
+          <motion.div 
+            key="payments"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-6"
+          >
+            <div className="cyber-panel overflow-hidden">
+               <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-white/5 bg-white/[0.02]">
+                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/30">User ID</th>
+                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/30">Amount</th>
+                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/30">TXID</th>
+                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/30">Status</th>
+                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/30">Date</th>
+                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/30 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {loading && payments.length === 0 ? (
+                        [1,2,3].map(i => (
+                          <tr key={i} className="animate-pulse">
+                            <td colSpan={6} className="px-8 py-6 h-16 bg-white/[0.01]" />
+                          </tr>
+                        ))
+                      ) : payments.length > 0 ? payments.map(payment => (
+                        <tr key={payment.id} className="hover:bg-white/[0.02] transition-colors group">
+                          <td className="px-8 py-5 text-[10px] font-mono text-white/20">
+                            {users.find(u => u.id === payment.userId)?.name || payment.userId.substring(0, 8)}
+                          </td>
+                          <td className="px-8 py-5 text-xs font-black text-white">{payment.amount} BDT</td>
+                          <td className="px-8 py-5 text-[10px] font-mono font-bold text-white/40">{payment.txid}</td>
+                          <td className="px-8 py-5">
+                             <span className={`px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${
+                               payment.status === 'approved' ? 'bg-green-500/10 border-green-500/20 text-green-500' :
+                               payment.status === 'rejected' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                               'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                             }`}>
+                               {payment.status}
+                             </span>
+                          </td>
+                          <td className="px-8 py-5 text-[10px] font-black text-white/20 uppercase">{new Date(payment.timestamp).toLocaleString()}</td>
+                          <td className="px-8 py-5 text-right">
+                             {payment.status === 'pending' && (
+                               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button onClick={() => handlePaymentAction(payment.id, 'approved', payment.userId)} className="h-8 w-8 flex items-center justify-center rounded-lg bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white transition-all" title="Approve"><Check size={14} /></button>
+                                  <button onClick={() => handlePaymentAction(payment.id, 'rejected', payment.userId)} className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all" title="Reject"><X size={14} /></button>
+                               </div>
+                             )}
+                          </td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan={6} className="px-8 py-12 text-center text-white/40 text-sm font-bold">No payments found.</td>
                         </tr>
                       )}
                     </tbody>
