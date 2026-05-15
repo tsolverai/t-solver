@@ -34,6 +34,19 @@ export const ChatBox: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [useThinking, setUseThinking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageFile, setImageFile] = useState<string | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageFile(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     const loadChats = async () => {
@@ -72,16 +85,19 @@ export const ChatBox: React.FC<{ user: UserProfile }> = ({ user }) => {
       text: textToSend,
       sender: 'user',
       timestamp: Date.now(),
-      category: 'general'
+      category: 'general',
+      imageBase64: imageFile || undefined
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+    const sentImage = imageFile;
+    setImageFile(null);
     setLoading(true);
 
     try {
       await storage.saveChat(userMsg);
-      const response = await localAI.process(textToSend, 'general', useThinking, user.level);
+      const response = await localAI.process(textToSend, 'general', useThinking, user.level, sentImage || undefined);
       
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -189,7 +205,10 @@ export const ChatBox: React.FC<{ user: UserProfile }> = ({ user }) => {
                     </div>
                   )}
                 </div>
-                <div className={`p-6 rounded-3xl text-[13px] leading-relaxed ${m.sender === 'user' ? 'bg-white text-black font-bold rounded-tr-none' : 'bg-[#1a1a1a] border border-white/5 rounded-tl-none text-white'}`}>
+                <div className={`p-6 rounded-3xl text-[13px] leading-relaxed flex flex-col gap-3 ${m.sender === 'user' ? 'bg-white text-black font-bold rounded-tr-none' : 'bg-[#1a1a1a] border border-white/5 rounded-tl-none text-white'}`}>
+                   {(m as any).imageBase64 && (
+                     <img src={(m as any).imageBase64} alt="Attachment" className="max-w-[200px] rounded-xl border border-black/10 dark:border-white/10" />
+                   )}
                    <div className="markdown-body">
                       <ReactMarkdown>{m.text}</ReactMarkdown>
                    </div>
@@ -225,6 +244,13 @@ export const ChatBox: React.FC<{ user: UserProfile }> = ({ user }) => {
       <div className="p-8 bg-black border-t border-white/5 space-y-6">
         {/* Dynamic Action Ribbons (Always Visible Below Input logic) */}
         <div className="flex flex-col gap-4">
+          <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageUpload} />
+          {imageFile && (
+            <div className="relative h-16 w-16 rounded-xl overflow-hidden border border-white/20">
+              <img src={imageFile} alt="Preview" className="h-full w-full object-cover" />
+              <button onClick={() => setImageFile(null)} className="absolute top-1 right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-black">X</button>
+            </div>
+          )}
           <div className="flex items-center gap-4 p-2 pl-6 bg-white/5 border border-white/10 rounded-3xl focus-within:border-white/40 transition-all shadow-glow">
             <input 
               value={input}
@@ -234,6 +260,9 @@ export const ChatBox: React.FC<{ user: UserProfile }> = ({ user }) => {
               className="flex-1 bg-transparent border-none outline-none py-4 text-sm font-bold text-white placeholder:text-white/10"
             />
             <div className="flex items-center gap-2 pr-2">
+              <button onClick={() => fileInputRef.current?.click()} className="h-11 w-11 text-white/20 hover:text-white transition-all flex items-center justify-center rounded-xl hover:bg-white/5">
+                <ImageIcon size={20} />
+              </button>
               <button className="h-11 w-11 text-white/20 hover:text-white transition-all flex items-center justify-center rounded-xl hover:bg-white/5">
                 <Mic size={20} />
               </button>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
@@ -54,19 +54,33 @@ export const SmartEducation: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [result, setResult] = useState<string | null>(null);
   const [useThinking, setUseThinking] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageFile(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSolve = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() && !imageFile) return;
     setLoading(true);
     setResult(null);
     try {
       const prompt = `Topic: ${subject}. Problem: ${input}. Provide a step-by-step solution in Bengali.`;
-      const res = await localAI.process(prompt, 'general', useThinking);
+      const res = await localAI.process(prompt, 'general', useThinking, undefined, imageFile || undefined);
       setResult(res);
     } catch (err) {
       setResult("Failed to solve. Please try again.");
     } finally {
       setLoading(false);
+      setImageFile(null); // Clear image after solving
     }
   };
 
@@ -190,14 +204,21 @@ export const SmartEducation: React.FC<{ user: UserProfile }> = ({ user }) => {
                           <button className="h-12 w-12 flex items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black dark:hover:bg-white text-black/40 dark:text-white/40 hover:text-white dark:hover:text-black transition-all group">
                             <Mic size={20} className="group-hover:scale-110 transition-transform" />
                           </button>
-                          <button className="h-12 w-12 flex items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black dark:hover:bg-white text-black/40 dark:text-white/40 hover:text-white dark:hover:text-black transition-all group">
+                          <button onClick={() => fileInputRef.current?.click()} className="h-12 w-12 flex items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black dark:hover:bg-white text-black/40 dark:text-white/40 hover:text-white dark:hover:text-black transition-all group">
                             <ImageIcon size={20} className="group-hover:scale-110 transition-transform" />
                           </button>
+                          <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageUpload} />
+                          {imageFile && (
+                            <div className="relative h-12 w-12 rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
+                              <img src={imageFile} alt="Upload preview" className="w-full h-full object-cover" />
+                              <button onClick={() => setImageFile(null)} className="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-black">X</button>
+                            </div>
+                          )}
                         </div>
                         
                         <button 
                           onClick={handleSolve}
-                          disabled={loading || !input.trim()}
+                          disabled={loading || (!input.trim() && !imageFile)}
                           className="h-16 px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl flex items-center gap-4 font-black uppercase text-xs tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none shadow-2xl"
                         >
                           {loading ? <Loader2 className="animate-spin h-5 w-5" /> : <><SendHorizontal size={20} /> Establish Solve</>}

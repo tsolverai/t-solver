@@ -9,14 +9,14 @@ class LocalAI {
     console.log("Local AI Ready");
   }
 
-  async process(prompt: string, category: 'math' | 'education' | 'business' | 'general' = 'general', useThinking: boolean = false, userLevel?: string): Promise<string> {
+  async process(prompt: string, category: 'math' | 'education' | 'business' | 'general' = 'general', useThinking: boolean = false, userLevel?: string, imageBase64?: string): Promise<string> {
     const p = prompt.trim();
-    if (!p) return "";
+    if (!p && !imageBase64) return "";
     const lang = localStorage.getItem('tsolver-lang') || 'bn';
 
     // Try Gemini First if available
     try {
-      const result = await askTSolver(prompt, undefined, useThinking, category, userLevel);
+      const result = await askTSolver(prompt || "Please describe this image.", imageBase64, useThinking, category, userLevel);
       if (result) return result;
     } catch (err: any) {
       // If it's a missing API key, we fallback to local logic
