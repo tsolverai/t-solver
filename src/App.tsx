@@ -73,7 +73,7 @@ import { Logo } from './components/Logo';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('tsolver_theme') !== 'light');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(true);
