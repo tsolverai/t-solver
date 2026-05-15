@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calculator as CalcIcon, 
-  BookOpen, 
-  LineChart, 
   Sparkles, 
   GraduationCap,
-  Scale,
   Globe2
 } from 'lucide-react';
 import { UserProfile } from '../lib/storage';
 import { useTranslation } from '../lib/useTranslation';
 
-// Tab Components
-import { Calculator } from './Calculator';
-import { AlgebraSolver } from './AlgebraSolver';
-import { FormulaFinder } from './FormulaFinder';
-import { GraphPlotter } from './GraphPlotter';
 import { SmartEducation } from './SmartEducation';
 
 export const Dashboard: React.FC<{ 
@@ -76,49 +67,9 @@ export const Dashboard: React.FC<{
         </p>
       </div>
 
-      {/* Tab Navigation Hub */}
-      <div className="w-full max-w-4xl bg-muted border border-border p-1.5 rounded-[32px] flex items-center gap-1 mb-12 overflow-x-auto no-scrollbar shadow-2xl">
-        <DashboardTab 
-          active={activeSubTab === 'basic'} 
-          onClick={() => setActiveSubTab('basic')} 
-          icon={<CalcIcon size={16} />} 
-          label={t.calc} 
-        />
-        <DashboardTab 
-          active={activeSubTab === 'algebra'} 
-          onClick={() => setActiveSubTab('algebra')} 
-          icon={<Scale size={16} />} 
-          label={t.smartNotes.toUpperCase()} 
-        />
-        <DashboardTab 
-          active={activeSubTab === 'formula'} 
-          onClick={() => setActiveSubTab('formula')} 
-          icon={<BookOpen size={16} />} 
-          label={t.formula} 
-        />
-        <DashboardTab 
-          active={activeSubTab === 'graph'} 
-          onClick={() => setActiveSubTab('graph')} 
-          icon={<LineChart size={16} />} 
-          label={t.graph} 
-        />
-        <DashboardTab 
-          active={activeSubTab === 'student'} 
-          onClick={() => setActiveSubTab('student')} 
-          icon={<GraduationCap size={16} />} 
-          label={t.explore} 
-        />
-      </div>
-
-      {/* Tab Content Rendering */}
-      <div className="w-full mb-20">
-        <AnimatePresence mode="wait">
-          {activeSubTab === 'basic' && <Calculator key="basic" />}
-          {activeSubTab === 'algebra' && <AlgebraSolver key="algebra" />}
-          {activeSubTab === 'formula' && <FormulaFinder key="formula" />}
-          {activeSubTab === 'graph' && <GraphPlotter key="graph" user={user} />}
-          {activeSubTab === 'student' && <SmartEducation key="student" user={user} />}
-        </AnimatePresence>
+      {/* Explore Hub Primary Content */}
+      <div className="w-full mb-16">
+        <SmartEducation user={user} />
       </div>
 
       {/* Quick Action Hub */}
@@ -154,23 +105,4 @@ export const Dashboard: React.FC<{
       </div>
     </div>
   );
-};
-
-function DashboardTab({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-4 py-3 px-6 rounded-2xl transition-all whitespace-nowrap group ${
-        active 
-          ? 'bg-background border border-border shadow-glow' 
-          : 'text-foreground/20 hover:text-foreground/40'
-      }`}
-    >
-      <div className={`p-2 rounded-xl border transition-all ${active ? 'bg-foreground border-foreground text-background' : 'border-foreground/10 group-hover:border-foreground/20'}`}>
-        {icon}
-      </div>
-      <span className={`text-[10px] font-black uppercase tracking-[0.15em] transition-all hidden md:inline ${active ? 'text-foreground' : 'text-foreground/20 group-hover:text-foreground/40'}`}>{label}</span>
-    </button>
-  );
-}
 

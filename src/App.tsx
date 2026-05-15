@@ -21,7 +21,8 @@ import {
   Users,
   Clock,
   Crown,
-  ShieldCheck
+  ShieldCheck,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,6 +59,9 @@ import { StudyGroups } from './components/StudyGroups';
 import { Leaderboard } from './components/Leaderboard';
 import { PremiumPage } from './components/PremiumPage';
 import { StudyTimer } from './components/StudyTimer';
+import { Calculator } from './components/Calculator';
+import { AlgebraSolver } from './components/AlgebraSolver';
+import { FormulaFinder } from './components/FormulaFinder';
 import { AboutPage } from './components/AboutPage';
 import { HowToUse } from './components/HowToUse';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
@@ -154,20 +158,15 @@ export default function App() {
   }
 
   const NAV_ITEMS = [
-    { id: 'dashboard', label: t.dashboard, icon: <LayoutDashboard size={18} /> },
-    { id: 'feed', label: 'Feed', icon: <Globe size={18} /> },
-    { id: 'doubts', label: t.doubts, icon: <MessageSquare size={18} /> },
-    { id: 'timer', label: 'Clock', icon: <Clock size={18} /> },
-    { id: 'premium', label: 'Premium', icon: <Crown size={18} /> },
-    { id: 'groups', label: 'Groups', icon: <Users size={18} /> },
-    { id: 'leaderboard', label: 'Ranking', icon: <Trophy size={18} /> },
-    { id: 'games', label: t.games, icon: <Sparkles size={18} /> },
-    { id: 'study', label: 'AI Help', icon: <Brain size={18} /> },
-    { id: 'quiz', label: t.quiz, icon: <Gamepad2 size={18} /> },
-    { id: 'subjects', label: t.subjects, icon: <BookOpen size={18} /> },
+    { id: 'dashboard', label: 'EXPLORE HUB', icon: <LayoutDashboard size={18} /> },
+    { id: 'tools', label: 'CALCULATOR', icon: <BarChart size={18} /> },
+    { id: 'notes', label: 'SMART NOTES', icon: <FileText size={18} /> },
+    { id: 'formulas', label: 'FORMULAS', icon: <BookOpen size={18} /> },
+    { id: 'graph', label: 'GRAPHER', icon: <TrendingUp size={18} /> },
+    { id: 'premium', label: 'PREMIUM', icon: <Crown size={18} /> },
     { 
       id: 'profile', 
-      label: t.profile, 
+      label: 'PROFILE', 
       icon: currentUser?.thumbnail || currentUser?.avatar ? (
         <img src={currentUser.thumbnail || currentUser.avatar} className="h-5 w-5 rounded-full object-cover border border-black/10 dark:border-white/20" alt="Avatar" />
       ) : (
@@ -176,7 +175,7 @@ export default function App() {
     },
     { 
       id: 'admin', 
-      label: 'Admin', 
+      label: 'ADMIN', 
       icon: <ShieldCheck size={18} /> 
     },
   ].filter(item => {
@@ -243,35 +242,29 @@ export default function App() {
         </div>
       </header>
 
-      <main className="safe-padding pb-32 pt-12 min-h-[80vh]">
+      <main className="safe-padding pb-32 pt-8 md:pt-12 min-h-[80vh]">
         {currentUser && (
           <AnimatePresence mode="wait">
             {activeTab === 'dashboard' && <Dashboard key="dash" user={currentUser} setActiveTab={setActiveTab} onExploreHub={setActiveSubject} />}
+            {activeTab === 'tools' && <Calculator key="tools" />}
+            {activeTab === 'notes' && <AlgebraSolver key="notes" />}
+            {activeTab === 'formulas' && <FormulaFinder key="formulas" />}
+            {activeTab === 'graph' && <GraphPlotter key="graph" user={currentUser} />}
+            {activeTab === 'premium' && <PremiumPage key="premium" user={currentUser} />}
+            {activeTab === 'profile' && <ProfileSettings key="profile" user={currentUser} onLogout={handleLogout} setActiveTab={setActiveTab} />}
+            {activeTab === 'admin' && <AdminDashboard key="admin" />}
+            
+            {/* Fallbacks for internal links from dashboard cards */}
             {activeTab === 'feed' && <PublicDashboard key="feed" user={currentUser} />}
             {activeTab === 'doubts' && <CommunityDoubts key="doubts" user={currentUser} />}
             {activeTab === 'groups' && <StudyGroups key="groups" user={currentUser} />}
             {activeTab === 'leaderboard' && <Leaderboard key="leader" user={currentUser} />}
-            {activeTab === 'admin' && <AdminDashboard key="admin" />}
             {activeTab === 'games' && <EducationalGames key="games" user={currentUser} />}
             {activeTab === 'study' && <StudyHelp key="study" user={currentUser} setActiveTab={setActiveTab} />}
             {activeTab === 'quiz' && <QuizSystem key="quiz" user={currentUser} />}
-            {activeTab === 'analytics' && <QuizAnalytics key="analytics" user={currentUser} />}
-            {activeTab === 'notes' && <SmartNotes key="notes" userId={currentUser.id} />}
             {activeTab === 'subjects' && <SubjectsBoard key="subjects" user={currentUser} onExploreHub={setActiveSubject} />}
-            {activeTab === 'journey' && <GamificationSystem key="journey" user={currentUser} />}
-            {activeTab === 'assignment' && <AssignmentRecommender key="assign" user={currentUser} />}
-            {activeTab === 'premium' && <PremiumPage key="premium" user={currentUser} />}
-            {activeTab === 'timer' && <StudyTimer key="timer" user={currentUser} />}
-            {activeTab === 'profile' && <ProfileSettings key="profile" user={currentUser} onLogout={handleLogout} setActiveTab={setActiveTab} />}
             {activeTab === 'about' && <AboutPage key="about" />}
             {activeTab === 'how-to-use' && <HowToUse key="how-to-use" />}
-            {activeTab === 'privacy' && <PrivacyPolicy key="privacy" />}
-            {activeTab === 'terms' && <TermsOfService key="terms" />}
-            {activeTab === 'contact' && <ContactPage key="contact" />}
-            
-            {/* Keeping original utility routes for internal navigation if needed */}
-            {activeTab === 'scan' && <ImageScanner key="scan" user={currentUser} />}
-            {activeTab === 'graph' && <GraphPlotter key="graph" user={currentUser} />}
           </AnimatePresence>
         )}
       </main>
@@ -321,21 +314,24 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating Bottom Navigation (Mobile/Tablet Focused) */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 px-4">
-         <div className="max-w-md mx-auto bg-white/80 dark:bg-black/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-[24px] p-1.5 flex items-center gap-1 shadow-2xl overflow-x-auto no-scrollbar shadow-glow">
-            {NAV_ITEMS.map((item) => (
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-0 sm:px-4 sm:bottom-6">
+         <div className="max-w-xl mx-auto bg-white/80 dark:bg-black/95 backdrop-blur-3xl border-t sm:border border-black/10 dark:border-white/10 sm:rounded-[24px] p-2 flex items-center justify-around shadow-2xl overflow-hidden shadow-glow">
+            {NAV_ITEMS.filter(i => i.id !== 'admin').map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`min-w-[52px] flex-1 h-12 flex flex-col items-center justify-center rounded-2xl transition-all relative group ${activeTab === item.id ? 'text-black dark:text-white bg-black/5 dark:bg-white/5' : 'text-black/30 dark:text-white/20 hover:text-black/60 dark:hover:text-white/40'}`}
+                className={`flex-1 flex flex-col items-center justify-center gap-1.5 py-2 transition-all relative group ${activeTab === item.id ? 'text-black dark:text-white' : 'text-black/30 dark:text-white/20'}`}
               >
                  <div className={`transition-transform duration-300 ${activeTab === item.id ? 'scale-110' : 'scale-90 group-hover:scale-100'}`}>
-                    {item.id === 'dashboard' ? <LayoutDashboard size={20} /> : item.icon}
+                    {item.icon}
                  </div>
+                 <span className={`text-[7px] font-black uppercase tracking-widest transition-all ${activeTab === item.id ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`}>
+                    {item.id === 'dashboard' ? 'EXPLORE' : item.id === 'tools' ? 'TOOLS' : item.label.split(' ')[0]}
+                 </span>
                  {activeTab === item.id && (
                    <motion.div 
                     layoutId="active-nav-indicator"
-                    className="absolute -bottom-1 h-1 w-1 bg-black dark:bg-white rounded-full"
+                    className="absolute -bottom-1 h-0.5 w-4 bg-black dark:bg-white rounded-full"
                    />
                  )}
               </button>
