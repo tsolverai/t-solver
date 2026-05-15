@@ -202,12 +202,12 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="hidden lg:flex items-center gap-2 overflow-x-auto no-scrollbar max-w-xl scale-90">
-                 {NAV_ITEMS.slice(0, 8).map(item => (
+              <div className="hidden lg:flex items-center gap-1 overflow-x-auto no-scrollbar max-w-xl">
+                 {NAV_ITEMS.map(item => (
                    <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`h-11 px-6 rounded-2xl flex items-center gap-3 transition-all whitespace-nowrap text-[9px] font-black uppercase tracking-widest ${activeTab === item.id ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black/40 dark:text-white/40'}`}
+                    className={`h-10 px-4 rounded-xl flex items-center gap-2 transition-all whitespace-nowrap text-[9px] font-black uppercase tracking-widest ${activeTab === item.id ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black/40 dark:text-white/40'}`}
                    >
                      {item.icon}
                      {item.label}
@@ -307,13 +307,13 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating Bottom Navigation (Mobile/Tablet Focused) */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm sm:max-w-md px-4">
-         <div className="bg-white/80 dark:bg-black/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-[32px] p-2 flex items-center justify-between shadow-2xl overflow-hidden shadow-glow">
-            {NAV_ITEMS_MOBILE.map((item) => (
+      <div className="fixed bottom-6 left-0 right-0 z-50 px-4">
+         <div className="max-w-md mx-auto bg-white/80 dark:bg-black/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-[24px] p-1.5 flex items-center gap-1 shadow-2xl overflow-x-auto no-scrollbar shadow-glow">
+            {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex-1 h-12 flex flex-col items-center justify-center rounded-2xl transition-all relative group ${activeTab === item.id ? 'text-black dark:text-white' : 'text-black/30 dark:text-white/20 hover:text-black/60 dark:hover:text-white/40'}`}
+                className={`min-w-[52px] flex-1 h-12 flex flex-col items-center justify-center rounded-2xl transition-all relative group ${activeTab === item.id ? 'text-black dark:text-white bg-black/5 dark:bg-white/5' : 'text-black/30 dark:text-white/20 hover:text-black/60 dark:hover:text-white/40'}`}
               >
                  <div className={`transition-transform duration-300 ${activeTab === item.id ? 'scale-110' : 'scale-90 group-hover:scale-100'}`}>
                     {item.id === 'dashboard' ? <LayoutDashboard size={20} /> : item.icon}

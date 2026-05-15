@@ -102,48 +102,45 @@ export const ChatBox: React.FC<{ user: UserProfile }> = ({ user }) => {
   };
 
   return (
-    <div className="flex flex-col h-[75vh] bg-[#1a1a1a] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
-      {/* Header */}
-      <div className="px-8 py-8 border-b border-white/5 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-5">
-            <div className="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-               <div className="h-6 w-6 border-2 border-white/20 rounded-md" />
+    <div className="flex flex-col h-[85vh] md:h-[75vh] bg-[#1a1a1a] border border-white/10 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl">
+       {/* Header */}
+      <div className="px-4 md:px-8 py-6 md:py-8 border-b border-white/5 space-y-4 md:space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 md:gap-5">
+            <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+               <div className="h-5 w-5 border-2 border-white/20 rounded-md" />
             </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-black tracking-tight text-white uppercase italic">T-Solver Assistant</h3>
+            <div className="space-y-0.5 md:space-y-1">
+              <h3 className="text-lg md:text-2xl font-black tracking-tight text-white uppercase italic">T-Solver Assistant</h3>
               <div className="flex items-center gap-2 text-white/40">
-                <Sparkles size={12} className="text-white/20" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.greeting}</span>
+                <Sparkles size={10} className="text-white/20" />
+                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em]">{t.greeting}</span>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-4 px-6 h-12 rounded-2xl bg-white/5 border border-white/10">
-               <Brain size={16} className={`h-4 w-4 ${useThinking ? 'text-white animate-pulse' : 'text-white/20'}`} />
-               <span className="text-[9px] font-black uppercase tracking-[0.2em]">THINKING</span>
+          <div className="flex items-center justify-between md:justify-end gap-3">
+            <div className="flex items-center gap-3 md:gap-4 px-4 md:px-6 h-10 md:h-12 rounded-xl md:rounded-2xl bg-white/5 border border-white/10">
+               <Brain size={14} className={`h-3.5 w-3.5 md:h-4 md:w-4 ${useThinking ? 'text-white animate-pulse' : 'text-white/20'}`} />
+               <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">THINKING</span>
                <Switch checked={useThinking} onCheckedChange={setUseThinking} className="scale-75" />
             </div>
-            <button className="h-10 w-10 flex items-center justify-center text-white/40 hover:text-white transition-all">
-              <FileText size={18} />
-            </button>
           </div>
         </div>
 
         {/* Quick Action Chips */}
-        <div className="flex gap-3">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
           <button 
             onClick={() => handleSend("Solve Math")}
-            className="h-10 px-6 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-wide hover:bg-white/10 transition-all text-white/60"
+            className="shrink-0 h-9 px-4 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-wide hover:bg-white/10 transition-all text-white/60"
           >
-            <Zap size={12} /> Solve Math
+            <Zap size={10} /> Solve Math
           </button>
           <button 
             onClick={() => handleSend("Translate")}
-            className="h-10 px-6 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-wide hover:bg-white/10 transition-all text-white/60"
+            className="shrink-0 h-9 px-4 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-wide hover:bg-white/10 transition-all text-white/60"
           >
-            <Zap size={12} /> Translate
+            <Zap size={10} /> Translate
           </button>
         </div>
       </div>

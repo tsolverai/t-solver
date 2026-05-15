@@ -111,7 +111,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className="max-w-md bg-black border border-white/10 p-0 rounded-[40px] shadow-2xl shadow-white/5 overflow-hidden no-scrollbar">
-        <div className="flex flex-col h-full max-h-[90vh] relative">
+                <div className="flex flex-col h-full max-h-[90vh] relative overflow-y-auto no-scrollbar">
           
           <AnimatePresence mode="wait">
             {mode === 'lang' && (
@@ -120,7 +120,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onComplete }
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="p-8 md:p-12 flex flex-col items-center text-center space-y-10"
+                className="p-6 md:p-12 flex flex-col items-center text-center space-y-8 md:space-y-10"
               >
                 <button 
                   onClick={() => setMode('welcome')}

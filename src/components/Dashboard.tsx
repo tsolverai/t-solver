@@ -56,22 +56,22 @@ export const Dashboard: React.FC<{
       </motion.div>
 
       {/* Main Branding */}
-      <div className="text-center space-y-4 mb-16 px-4">
+      <div className="text-center space-y-4 mb-10 md:mb-16 px-4">
         <motion.div
            initial={{ opacity: 0, scale: 0.9 }}
            animate={{ opacity: 1, scale: 1 }}
            className="space-y-2 relative"
         >
-          <h1 className="text-7xl font-black tracking-[-0.08em] uppercase italic text-foreground">T-Solver</h1>
+          <h1 className="text-5xl md:text-7xl font-black tracking-[-0.08em] uppercase italic text-foreground">T-Solver</h1>
           <div className="flex items-center justify-center gap-2">
             <span className="h-1.5 w-1.5 bg-foreground rounded-full animate-pulse" />
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/30">
+            <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-foreground/30">
               {getEducationLevelLabel(user.level)} {t.levelSuffix}
             </span>
             <span className="h-1.5 w-1.5 bg-foreground rounded-full animate-pulse" />
           </div>
         </motion.div>
-        <p className="max-w-md mx-auto text-foreground/40 text-sm font-bold leading-relaxed">
+        <p className="max-w-md mx-auto text-foreground/40 text-xs md:text-sm font-bold leading-relaxed">
           {getGreetingMessage()}
         </p>
       </div>

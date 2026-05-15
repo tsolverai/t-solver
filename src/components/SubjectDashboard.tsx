@@ -224,12 +224,12 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ subjectId, u
              </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
              {['overview', 'topics', 'practice', 'analytics'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => { setActiveTab(tab as any); setSubView(null); }}
-                  className={`h-11 px-6 rounded-2xl font-black uppercase text-[9px] tracking-widest transition-all border ${activeTab === tab ? 'bg-white text-black border-white' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+                  className={`h-10 md:h-11 px-4 md:px-6 rounded-xl md:rounded-2xl font-black uppercase text-[8px] md:text-[9px] tracking-widest transition-all border whitespace-nowrap ${activeTab === tab ? 'bg-white text-black border-white' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
                 >
                    {tab}
                 </button>
