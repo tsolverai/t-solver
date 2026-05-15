@@ -179,7 +179,13 @@ export default function App() {
       label: 'Admin', 
       icon: <ShieldCheck size={18} /> 
     },
-  ];
+  ].filter(item => {
+    if (item.id === 'admin') {
+      const admins = ['tsolverai@gmail.com', 'admin@tsolver.com'];
+      return currentUser && admins.includes(currentUser.email);
+    }
+    return true;
+  });
 
   const NAV_ITEMS_MOBILE = NAV_ITEMS.slice(0, 5).concat([NAV_ITEMS[NAV_ITEMS.length - 1]]);
 
