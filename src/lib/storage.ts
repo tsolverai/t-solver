@@ -329,6 +329,39 @@ class StorageManager {
     return 'Web Browser';
   }
 
+  async getAllUsers(): Promise<UserProfile[]> {
+    const db = await this.getDB();
+    const localUsers = await db.getAll('users');
+    let allUsers = [...localUsers];
+
+    if (isSupabaseConfigured()) {
+      try {
+        const { data } = await supabase.from('profiles').select('*').order('join_date', { ascending: false });
+        if (data && data.length > 0) {
+           const sbUsers = data.map((p: any) => ({
+              id: p.local_id || p.id,
+              name: p.name,
+              email: p.email,
+              level: p.level,
+              avatar: p.avatar,
+              preferences: p.preferences || { lang: 'en', darkMode: true },
+              joinDate: p.join_date ? new Date(p.join_date).getTime() : Date.now()
+           })) as UserProfile[];
+           
+           const existingIds = new Set(allUsers.map(u => u.id));
+           sbUsers.forEach(su => {
+             if (!existingIds.has(su.id)) {
+               allUsers.push(su);
+             }
+           });
+        }
+      } catch (e) {
+        console.warn("Could not fetch from Supabase in getAllUsers", e);
+      }
+    }
+    return allUsers.sort((a, b) => b.joinDate - a.joinDate);
+  }
+
   async getCurrentUser(): Promise<UserProfile | null> {
     let id: string | null = localStorage.getItem('tsolver_current_user');
     

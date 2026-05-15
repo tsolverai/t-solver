@@ -60,10 +60,12 @@ export const AdminDashboard: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      if (activeView === 'users' && isSupabaseConfigured()) {
-        const { data } = await supabase.from('profiles').select('*').order('join_date', { ascending: false });
-        setUsers(data || []);
-      } else if (activeView === 'feedback' && isSupabaseConfigured()) {
+      if (activeView === 'users' || activeView === 'stats') {
+        const allUsers = await storage.getAllUsers();
+        setUsers(allUsers || []);
+      }
+      
+      if ((activeView === 'feedback' || activeView === 'stats') && isSupabaseConfigured()) {
         const { data } = await supabase.from('feedback').select('*').order('created_at', { ascending: false });
         setFeedback(data || []);
       }
@@ -248,7 +250,7 @@ export const AdminDashboard: React.FC = () => {
                         </tr>
                       )) : (
                         <tr>
-                          <td colSpan={6} className="px-8 py-12 text-center text-white/40 text-sm font-bold">No users found. {isSupabaseConfigured() ? '' : 'Supabase is not configured.'}</td>
+                          <td colSpan={6} className="px-8 py-12 text-center text-white/40 text-sm font-bold">No users found.</td>
                         </tr>
                       )}
                     </tbody>
