@@ -39,6 +39,7 @@ export interface ChatMessage {
   timestamp: number;
   category: string;
   imageUrl?: string;
+  imageBase64?: string;
 }
 
 export interface Assignment {
