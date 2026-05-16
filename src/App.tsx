@@ -289,13 +289,30 @@ export default function App() {
               </nav>
 
               <div className="flex items-center gap-2 sm:gap-3">
+                <a
+                  href="https://bucket.appilix.com/app-apk-f43e5bbbfe8442959b50eff40021598e-1778907950.apk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden sm:flex items-center gap-2 h-10 px-4 sm:h-12 sm:px-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-glow hover:scale-105 transition-all"
+                >
+                  <Download size={16} />
+                  Download App
+                </a>
+                <a
+                  href="https://bucket.appilix.com/app-apk-f43e5bbbfe8442959b50eff40021598e-1778907950.apk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sm:hidden flex items-center justify-center h-10 w-10 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl shadow-glow hover:scale-105 transition-all"
+                >
+                  <Download size={16} />
+                </a>
                 {currentUser && <NotificationBell userId={currentUser.id} />}
                 <div className="h-10 w-[1px] bg-black/5 dark:bg-white/5 mx-2 hidden lg:block" />
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setIsDarkMode(!isDarkMode)} 
-                  className="rounded-2xl h-12 w-12 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
+                  className="rounded-2xl h-10 w-10 sm:h-12 sm:w-12 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
                 >
                   {isDarkMode ? <Sun className="h-5 w-5 group-hover:rotate-45 transition-transform" /> : <Moon className="h-5 w-5 group-hover:-rotate-12 transition-transform" />}
                 </Button>
