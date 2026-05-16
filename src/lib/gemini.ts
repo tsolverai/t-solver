@@ -1,5 +1,5 @@
 export async function askTSolver(prompt: string, imageBase64?: string, useThinking: boolean = false, mode: string = 'general', userLevel?: string) {
-  const OPENROUTER_API_KEY = "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";
+  const OPENROUTER_API_KEY = (import.meta as any).env?.VITE_OPENROUTER_API_KEY || "";
 
   const isImageGen = /generate image|create image|draw|image of|photo of|ছবির|ছবি তৈরি করো/i.test(prompt);
 
