@@ -27,7 +27,7 @@ export const StudyHelp: React.FC<{ user: UserProfile, setActiveTab: (tab: string
         <div className="space-y-4">
           <h2 className="text-5xl font-black uppercase tracking-tighter italic lg:text-7xl">Study Help</h2>
           <p className="text-white/40 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
-             Academic Assistant <span className="h-1 w-1 bg-white/20 rounded-full" /> Powered by Local AI
+             Academic Assistant <span className="h-1 w-1 bg-white/20 rounded-full" /> Powered by Gemini AI
           </p>
         </div>
       </div>

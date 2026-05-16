@@ -268,7 +268,7 @@ export class EducationalEngine {
     }
 
     if (q.includes('hello') || q.includes('hi')) {
-      return `Hello! I am your local AI Teacher for ${subject}. How can I assist your learning today?`;
+      return `Hello! I am your AI Teacher for ${subject}. How can I assist your learning today?`;
     }
 
     return "That's an interesting question. While I don't have a specific answer for that yet, I can help you with topics like Algebra, Calculus, or Mechanics. What would you like to explore?";

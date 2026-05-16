@@ -88,7 +88,7 @@ export const AssignmentRecommender: React.FC<{ user: UserProfile }> = ({ user })
         <div className="space-y-4">
           <h2 className="text-5xl font-black uppercase tracking-tighter italic">Assignment</h2>
           <p className="text-white/40 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
-             Solve & Manage <span className="h-1 w-1 bg-white/20 rounded-full" /> Local AI Intelligence
+             Solve & Manage <span className="h-1 w-1 bg-white/20 rounded-full" /> Gemini AI Intelligence
           </p>
         </div>
 

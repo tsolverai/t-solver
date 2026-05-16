@@ -51,7 +51,7 @@ export const OwnerModal: React.FC<OwnerModalProps> = ({ isOpen, onClose, isInsta
                 </div>
                 <div>
                   <h3 className="font-black uppercase text-xs tracking-widest">Install T-Solver</h3>
-                  <p className="text-[10px] font-bold opacity-60">Experience local AI in standalone mode</p>
+                  <p className="text-[10px] font-bold opacity-60">Experience Gemini AI</p>
                 </div>
               </div>
               <button 

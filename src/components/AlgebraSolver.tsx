@@ -166,7 +166,7 @@ export const AlgebraSolver: React.FC = () => {
         console.warn('Symbolic solve failed, falling back to AI');
       }
 
-      // 2. AI Solving (Deep explanation)
+      // 2. AI Solving (Deep explanation via Gemini API)
       const result = await localAI.process(`Solve equation step by step: ${equation}`);
       setSolution(result || (lang === 'bn' ? "কোন সমাধান পাওয়া যায়নি।" : "No solution found."));
     } catch (err: any) {
