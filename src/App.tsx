@@ -204,13 +204,13 @@ export default function App() {
     },
   ].filter(item => {
     if (item.id === 'admin') {
-      const admins = ['tsolverai@gmail.com', 'admin@tsolver.com', 'hscstudypdf@gmail.com'];
+      const admins = ['tsolverai@gmail.com', 'admin@tsolver.com', 'hscstudypdf@gmail.com', 'freelancertachin@gmail.com', 'hossenahmed083@gmail.com', 'fortestingyou01@gmail.com'];
       return currentUser && admins.includes(currentUser.email);
     }
     return true;
   });
 
-  const isAdmin = currentUser && ['tsolverai@gmail.com', 'admin@tsolver.com', 'hscstudypdf@gmail.com'].includes(currentUser.email);
+  const isAdmin = currentUser && ['tsolverai@gmail.com', 'admin@tsolver.com', 'hscstudypdf@gmail.com', 'freelancertachin@gmail.com', 'hossenahmed083@gmail.com', 'fortestingyou01@gmail.com'].includes(currentUser.email);
 
   if (globalSettings.maintenanceMode && !isAdmin) {
     return (
