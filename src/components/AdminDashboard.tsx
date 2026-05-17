@@ -199,11 +199,12 @@ export const AdminDashboard: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-8"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <StatCard label="Total Users" value={users.length || '---'} icon={Users} color="#00f2ff" />
               <StatCard label="Active Sessions" value="2.4k" icon={Activity} color="#00ff88" />
               <StatCard label="DB Latency" value="12ms" icon={Database} color="#ff7700" />
               <StatCard label="Feedback" value={feedback.length || '---'} icon={MessageSquare} color="#ff33cc" />
+              <StatCard label="AI Engine Load" value="42%" icon={Cpu} color="#ffff00" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -249,6 +250,58 @@ export const AdminDashboard: React.FC = () => {
                      ))}
                   </div>
                </div>
+            </div>
+
+            {/* Bottom Area – System Logs / Activity */}
+            <div className="cyber-panel p-8 space-y-6 mt-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-white/40">Recent Activity & System Logs</h3>
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Info:</span>
+                    <span className="text-xs font-bold text-blue-500">24</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Warnings:</span>
+                    <span className="text-xs font-bold text-yellow-500">3</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Errors:</span>
+                    <span className="text-xs font-bold text-red-500">0</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3 border-b border-white/5">
+                  <div className="flex items-center gap-4">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase">INFO</span>
+                    <span className="text-sm font-bold text-white">New user registered</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase">2 mins ago</span>
+                </div>
+                <div className="flex items-center justify-between py-3 border-b border-white/5">
+                  <div className="flex items-center gap-4">
+                    <span className="px-2 py-0.5 rounded-md bg-green-500/10 text-green-500 text-[8px] font-black uppercase">INFO</span>
+                    <span className="text-sm font-bold text-white">Payment verified</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase">15 mins ago</span>
+                </div>
+                <div className="flex items-center justify-between py-3 border-b border-white/5">
+                  <div className="flex items-center gap-4">
+                    <span className="px-2 py-0.5 rounded-md bg-yellow-500/10 text-yellow-500 text-[8px] font-black uppercase">WARNING</span>
+                    <span className="text-sm font-bold text-white">High CPU usage detected</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase">1 hour ago</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <div className="flex items-center gap-4">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase">INFO</span>
+                    <span className="text-sm font-bold text-white">AI core restarted</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase">2 hours ago</span>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
